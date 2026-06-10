@@ -1,0 +1,25 @@
+{
+  "title": "AI systems out-persuade expert humans",
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "description": "Reproduction repository for the paper \"AI systems out-persuade expert humans\": the full analysis pipeline (data -> results -> figures + tables) and a de-identified export of the study data. Code is released under the MIT License; the de-identified data under data/ are released under CC BY 4.0. See README.md and code/redact_data.R for details.",
+  "creators": [
+    { "name": "Hackenburg, Kobi" },
+    { "name": "Wagner, Caroline" },
+    { "name": "Hewitt, Luke" },
+    { "name": "Tappin, Ben M." },
+    { "name": "Saunders, Ed" },
+    { "name": "Kirk, Hannah Rose" },
+    { "name": "Margetts, Helen" },
+    { "name": "Summerfield, Christopher" }
+  ],
+  "keywords": [
+    "persuasion",
+    "large language models",
+    "artificial intelligence",
+    "political attitudes",
+    "randomized experiments",
+    "reproducibility"
+  ]
+}

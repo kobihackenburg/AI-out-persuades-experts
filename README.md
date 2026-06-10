@@ -140,3 +140,11 @@ The exact package set is pinned in `renv.lock` (R 4.4.3) and restored with
 `renv::restore()`. `.Rprofile` and `.renvignore` are deliberate: they add the
 renv library to the path manually and stop renv from re-scanning the large
 `data/`/`output/` trees on every R startup. See the comments in `.Rprofile`.
+
+## License
+
+The code in this repository is released under the MIT License (`LICENSE`). The
+de-identified data under `data/` are released under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0; `data/LICENSE`). If you use
+either, please cite the paper and the archived repository (see *Citation* above
+and `CITATION.cff`).

@@ -1,0 +1,63 @@
+# Citation metadata for this repository.
+# GitHub shows a "Cite this repository" button from this file, and Zenodo reads
+# it to populate the archived record's metadata on each release.
+# Optional: add an `orcid: "https://orcid.org/0000-0000-0000-0000"` line under
+# any author, and update `version` / `date-released` for each tagged release.
+cff-version: 1.2.0
+message: "If you use this software or data, please cite both the article and the archived repository."
+title: "AI systems out-persuade expert humans"
+type: software
+authors:
+  - family-names: Hackenburg
+    given-names: Kobi
+  - family-names: Wagner
+    given-names: Caroline
+  - family-names: Hewitt
+    given-names: Luke
+  - family-names: Tappin
+    given-names: Ben M.
+  - family-names: Saunders
+    given-names: Ed
+  - family-names: Kirk
+    given-names: Hannah Rose
+  - family-names: Margetts
+    given-names: Helen
+  - family-names: Summerfield
+    given-names: Christopher
+version: 1.0.0
+date-released: 2026-06-10
+license:
+  - MIT
+  - CC-BY-4.0
+repository-code: "https://github.com/kobihackenburg/AI-out-persuades-experts"
+url: "https://github.com/kobihackenburg/AI-out-persuades-experts"
+keywords:
+  - persuasion
+  - large language models
+  - artificial intelligence
+  - political attitudes
+  - randomized experiments
+  - reproducibility
+preferred-citation:
+  type: article
+  title: "AI systems out-persuade expert humans"
+  authors:
+    - family-names: Hackenburg
+      given-names: Kobi
+    - family-names: Wagner
+      given-names: Caroline
+    - family-names: Hewitt
+      given-names: Luke
+    - family-names: Tappin
+      given-names: Ben M.
+    - family-names: Saunders
+      given-names: Ed
+    - family-names: Kirk
+      given-names: Hannah Rose
+    - family-names: Margetts
+      given-names: Helen
+    - family-names: Summerfield
+      given-names: Christopher
+  year: 2026
+  # Update the venue/DOI below once the paper is published.
+  journal: "Preprint"
