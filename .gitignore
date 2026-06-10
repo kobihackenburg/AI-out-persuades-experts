@@ -9,8 +9,8 @@
 output/results/*.rds
 output/results/_data/
 
-# Re-identification key: must NEVER appear in the public repo. It only exists
-# in the private repo, but this guard keeps it out of the public tree too.
+# De-identification key produced by code/redact_data.R. It is not part of this
+# release; listed here as a safeguard so it can never be accidentally committed.
 .redact_id_map.csv
 
 # OS / editor cruft
