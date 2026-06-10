@@ -1,0 +1,44 @@
+# Generated artefacts under output/.
+#
+# The figure + table deliverables (output/figures/**, output/tables/**) and the
+# numbers lookup (output/results/_numbers.json) ARE committed, so the published
+# figures and tables can be browsed on GitHub without installing R or running
+# the pipeline. The fitted-model objects (output/results/*.rds) and the JSONL
+# parse cache (output/results/_data/) are large and fully derivable from
+# data/ + code/, so they are not tracked.
+output/results/*.rds
+output/results/_data/
+
+# Re-identification key: must NEVER appear in the public repo. It only exists
+# in the private repo, but this guard keeps it out of the public tree too.
+.redact_id_map.csv
+
+# OS / editor cruft
+.DS_Store
+
+# Python: local virtualenv + bytecode caches (e.g. for the elite_debater
+# annotation step); never commit them.
+.venv/
+__pycache__/
+*.pyc
+
+# R session / project files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*.Rproj
+.lintr
+
+# Stray default-device output R writes when a plot is drawn with no explicit
+# device open (guarded against in code, ignored here as a safety net).
+Rplots.pdf
+
+# renv: track the lockfile, ignore the local library
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+.Rprofile.local

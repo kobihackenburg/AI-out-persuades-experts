@@ -1,0 +1,50 @@
+\begin{table}[t]
+\centering
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\caption{
+\textbf{Per-condition mean fact-checkable claims per conversation vs. persuasive impact.} \\ 
+Means over fact-checked conversations; persuasive impact is the same arm's LMM estimate vs. control (R\textasciicircum{}2 = 0.81 overall).
+} 
+\begin{tabular}{lccccc}
+\toprule
+\multicolumn{1}{c}{\textbf{Condition}} & \multicolumn{1}{c}{\textbf{Study}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{n \\ conv}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Facts / \\ conv}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Estimate \\ (pp)}}}} & \multicolumn{1}{c}{\textbf{95\% CI}} \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{6}{l}{AI} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 (Info) S1 & Study 1 & 1,674 & 55.9 & +15.05 & [+13.45, +16.65] \\ 
+Grok 4.20 (Info) S3 & Study 3 &   404 & 53.9 & +10.99 & [+8.73, +13.24] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 (Info) S2 & Study 2 &   501 & 51.3 & +15.08 & [+13.00, +17.17] \\ 
+ChatGPT-4o (latest) (Info) S1 & Study 1 & 1,057 & 36.9 & +14.42 & [+12.82, +16.02] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ChatGPT-4o (latest) (Info) S2 & Study 2 &   476 & 34.8 & +12.36 & [+10.24, +14.48] \\ 
+Claude Opus 4.6 (Info) S3 & Study 3 &   127 & 29.9 & +14.33 & [+12.14, +16.53] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro (Info) S1 & Study 1 & 1,717 & 26.4 & +13.63 & [+12.04, +15.22] \\ 
+Gemini 2.5 Pro (Info) S2 & Study 2 &   453 & 23.5 & +13.00 & [+10.85, +15.15] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+GPT-5.4 (Info) S3 & Study 3 &   370 & 21.6 & +10.75 & [+8.45, +13.05] \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{6}{l}{AI (Constrained)} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 (Constrained) & Study 2 &   469 & 19.3 & +10.58 & [+8.45, +12.70] \\ 
+ChatGPT-4o (latest) (Constrained) & Study 2 &   467 & 10.7 & +10.12 & [+7.99, +12.25] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro (Constrained) & Study 2 &   455 & 7.3 & +7.37 & [+5.23, +9.51] \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{6}{l}{Human} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Coached Elite Debater & Study 2 &   844 & 4.5 & +9.42 & [+8.02, +10.83] \\ 
+Professional Canvasser & Study 3 &   375 & 3.4 & +6.88 & [+5.39, +8.37] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Elite Debater & Study 1 &   440 & 3.0 & +8.31 & [+6.90, +9.72] \\ 
+Elite Layperson & Study 1 &   379 & 3.0 & +7.29 & [+5.87, +8.71] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Random Layperson & Study 1 &   179 & 2.1 & +4.66 & [+3.29, +6.04] \\ 
+\bottomrule
+\end{tabular}
+\label{tab:fact_density}
+\end{table}

@@ -1,0 +1,7 @@
+# Folders renv should NOT walk when discovering R-package dependencies.
+# Without this, renv re-scans hundreds of MB of CSV / JSONL on every R
+# startup (via renv_load_report_synchronized -> renv_snapshot_dependencies),
+# which makes Rscript hang for minutes.
+data/
+output/
+study_context/

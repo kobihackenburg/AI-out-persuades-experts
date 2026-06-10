@@ -1,0 +1,32 @@
+\begin{landscape}
+\begin{table}[t]
+\centering
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\caption{
+\textbf{Constrained AI calibration -- target vs. realized per-model behaviour (Study 2).} \\ 
+Targets are the preregistered Elite Debater Study 1 means (51 words; 92 s). The realized per-model mean of approximately 55 words/msg sits \textasciitilde{}4 words above target because the sampler draws each message length from a truncated normal centred on 51 and a lagged matching design adjusts upward when prior messages came in below target; the realized response delay (\textasciitilde{}92 s) tracks target exactly by design. Realized values are computed from conversation counts in the data on the Study 2 AI arms.
+} 
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccccc}
+\toprule
+\multicolumn{1}{c}{\textbf{Model}} & \multicolumn{1}{c}{\textbf{n}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Target \\ words/msg}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Realized mean \\ words/msg}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Realized median \\ words/msg}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Target \\ delay (s)}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Realized mean \\ delay (s)}}}} \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{7}{l}{Constrained} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro & 458 & 51 & 55.4 & 54.1 & 92 & \textasciitilde{}92 \\ 
+Claude Opus 4.1 & 470 & 51 & 55.3 & 42.5 & 92 & \textasciitilde{}92 \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ChatGPT-4o & 468 & 51 & 55.3 & 45.9 & 92 & \textasciitilde{}92 \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{7}{l}{Info-prompted} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro & 453 & -- & 323.9 & 322.4 & <1 & <1 \\ 
+ChatGPT-4o & 476 & -- & 305.7 & 287.2 & <1 & <1 \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 & 501 & -- & 248.9 & 249.5 & <1 & <1 \\ 
+\bottomrule
+\end{tabular*}
+\label{tab:constrained_calibration}
+\end{table}
+\end{landscape}

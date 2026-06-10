@@ -1,0 +1,52 @@
+\begin{landscape}
+\begin{table}[t]
+\centering
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\caption{
+\textbf{Per-condition factual accuracy vs. persuasive impact.} \\ 
+A claim is counted as accurate if its web-search veracity score exceeds 50 on the 0-100 scale; persuasive impact is the same arm's LMM estimate vs. control.
+} 
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccccc}
+\toprule
+\multicolumn{1}{c}{\textbf{Condition}} & \multicolumn{1}{c}{\textbf{Study}} & \multicolumn{1}{c}{\textbf{Claims}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{\% \\ accurate}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Mean \\ veracity}}}} & \multicolumn{1}{c}{\textbf{\raisebox{-0.5\height}{\shortstack{Estimate \\ (pp)}}}} & \multicolumn{1}{c}{\textbf{95\% CI}} \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{7}{l}{AI} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+GPT-5.4 (Info) S3 & Study 3 &  8,173 & 96.5 & 89.0 & +10.75 & [+8.45, +13.05] \\ 
+Gemini 2.5 Pro (Info) S1 & Study 1 & 45,425 & 85.1 & 81.3 & +13.63 & [+12.04, +15.22] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro (Info) S2 & Study 2 & 10,720 & 84.9 & 81.1 & +13.00 & [+10.85, +15.15] \\ 
+Claude Opus 4.6 (Info) S3 & Study 3 &  3,814 & 73.6 & 72.1 & +14.33 & [+12.14, +16.53] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ChatGPT-4o (latest) (Info) S2 & Study 2 & 16,565 & 61.2 & 59.7 & +12.36 & [+10.24, +14.48] \\ 
+ChatGPT-4o (latest) (Info) S1 & Study 1 & 38,966 & 61.0 & 59.8 & +14.42 & [+12.82, +16.02] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 (Info) S2 & Study 2 & 25,446 & 21.6 & 27.1 & +15.08 & [+13.00, +17.17] \\ 
+Claude Opus 4.1 (Info) S1 & Study 1 & 93,423 & 21.5 & 27.1 & +15.05 & [+13.45, +16.65] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Grok 4.20 (Info) S3 & Study 3 & 21,526 & 20.8 & 25.8 & +10.99 & [+8.73, +13.24] \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{7}{l}{AI (Constrained)} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro (Constrained) & Study 2 &  3,373 & 82.6 & 79.4 & +7.37 & [+5.23, +9.51] \\ 
+ChatGPT-4o (latest) (Constrained) & Study 2 &  5,025 & 59.8 & 58.5 & +10.12 & [+7.99, +12.25] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 (Constrained) & Study 2 &  9,048 & 37.2 & 43.3 & +10.58 & [+8.45, +12.70] \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{7}{l}{Human} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Professional Canvasser & Study 3 &  4,253 & 81.9 & 82.1 & +6.88 & [+5.39, +8.37] \\ 
+Elite Debater & Study 1 &  1,353 & 72.4 & 72.0 & +8.31 & [+6.90, +9.72] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Elite Layperson & Study 1 &  1,167 & 71.0 & 71.4 & +7.29 & [+5.87, +8.71] \\ 
+Random Layperson & Study 1 &    378 & 67.5 & 67.9 & +4.66 & [+3.29, +6.04] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Coached Elite Debater & Study 2 &  3,826 & 65.5 & 66.9 & +9.42 & [+8.02, +10.83] \\ 
+\bottomrule
+\end{tabular*}
+\label{tab:fact_accuracy_by_condition}
+\end{table}
+\end{landscape}

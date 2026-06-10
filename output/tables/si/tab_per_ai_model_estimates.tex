@@ -1,0 +1,39 @@
+\begin{table}[t]
+\centering
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\caption{
+\textbf{Per-AI-model treatment-effect estimates.} \\ 
+Each row reports estimate [95\% CI] in percentage points for one model in one study; underlies the black stencils on Fig. 1.
+} 
+\begin{tabular}{lccc}
+\toprule
+\multicolumn{1}{c}{\textbf{Model}} & \multicolumn{1}{c}{\textbf{Study}} & \multicolumn{1}{c}{\textbf{Estimate}} & \multicolumn{1}{c}{\textbf{95\% CI}} \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{4}{l}{Constrained} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ChatGPT-4o (latest) & Study 2 & +10.12 & [+7.99, +12.25] \\ 
+Claude Opus 4.1 & Study 2 & +10.58 & [+8.45, +12.70] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro & Study 2 & +7.37 & [+5.23, +9.51] \\ 
+\midrule\addlinespace[2.5pt]
+\multicolumn{4}{l}{Info-prompted} \\[2.5pt] 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ChatGPT-4o (latest) & Study 1 & +14.42 & [+12.82, +16.02] \\ 
+ChatGPT-4o (latest) & Study 2 & +12.36 & [+10.24, +14.48] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.1 & Study 1 & +15.05 & [+13.45, +16.65] \\ 
+Claude Opus 4.1 & Study 2 & +15.08 & [+13.00, +17.17] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Claude Opus 4.6 & Study 3 & +14.33 & [+12.14, +16.53] \\ 
+GPT-5.4 & Study 3 & +10.75 & [+8.45, +13.05] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Gemini 2.5 Pro & Study 1 & +13.63 & [+12.04, +15.22] \\ 
+Gemini 2.5 Pro & Study 2 & +13.00 & [+10.85, +15.15] \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+Grok 4.20 & Study 3 & +10.99 & [+8.73, +13.24] \\ 
+\bottomrule
+\end{tabular}
+\label{tab:per_ai_model_estimates}
+\end{table}

@@ -1,0 +1,30 @@
+\begin{table}[t]
+\centering
+\captionsetup{justification=raggedright,singlelinecheck=false}
+\caption{
+\textbf{Study 4 donation LMM -- full fixed-effects coefficient table.} \\ 
+donation \textasciitilde{} pre\_support + pre\_willingness + age + ideology + group + (1|persuader). N = 1842; n\_persuader = 1190. Reference: group = control.
+} 
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc}
+\toprule
+\multicolumn{1}{c}{\textbf{Term}} & \multicolumn{1}{c}{\textbf{Estimate}} & \multicolumn{1}{c}{\textbf{SE}} & \multicolumn{1}{c}{\textbf{t}} & \multicolumn{1}{c}{\textbf{p}} \\ 
+\midrule\addlinespace[2.5pt]
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+(Intercept) & -16.723 & 6.795 & -2.46 & -- \\ 
+pre\_attitude & +0.273 & 0.073 & 3.74 & -- \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+pre\_donation\_will & +0.450 & 0.038 & 11.81 & -- \\ 
+age & +0.367 & 0.087 & 4.22 & -- \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ideology.L & -5.451 & 3.300 & -1.65 & -- \\ 
+ideology.Q & -5.767 & 2.940 & -1.96 & -- \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+ideology.C & -1.148 & 2.530 & -0.45 & -- \\ 
+ideology\textasciicircum{}4 & -5.030 & 2.057 & -2.45 & -- \\ 
+\noalign{{\color{gray!15}\hrule height \dimexpr\ht\strutbox+\dp\strutbox\relax depth 0pt}\nointerlineskip\vskip -\dimexpr\ht\strutbox+\dp\strutbox\relax}
+groupcanvasser & +6.440 & 3.263 & 1.97 & -- \\ 
+groupai & +17.210 & 3.008 & 5.72 & -- \\ 
+\bottomrule
+\end{tabular*}
+\label{tab:study4_lmm_coefs}
+\end{table}
