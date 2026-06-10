@@ -26,6 +26,11 @@ authors:
     given-names: Christopher
 version: 1.0.0
 date-released: 2026-06-10
+doi: 10.5281/zenodo.20629034
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20629034
+    description: "Archived repository (code and de-identified data) on Zenodo."
 license:
   - MIT
   - CC-BY-4.0

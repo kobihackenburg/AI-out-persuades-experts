@@ -2,7 +2,10 @@
 
 ## Citation
 
-If you use this code or data, please cite:
+If you use this code or data, please cite the paper and the archived repository.
+
+This repository is permanently archived on Zenodo:
+[https://doi.org/10.5281/zenodo.20629034](https://doi.org/10.5281/zenodo.20629034)
 
 ```bibtex
 @article{hackenburg2026outpersuade,
@@ -10,9 +13,18 @@ If you use this code or data, please cite:
   author  = {Hackenburg, Kobi and Wagner, Caroline and Hewitt, Luke and
              Tappin, Ben M. and Saunders, Ed and Kirk, Hannah Rose and
              Margetts, Helen and Summerfield, Christopher},
-  year    = {2026},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},  % TODO: add arXiv id once posted
-  url     = {https://arxiv.org/abs/XXXX.XXXXX}  % TODO: add arXiv URL once posted
+  year    = {2026}
+}
+
+@software{hackenburg2026archive,
+  title     = {AI systems out-persuade expert humans (code and de-identified data)},
+  author    = {Hackenburg, Kobi and Wagner, Caroline and Hewitt, Luke and
+               Tappin, Ben M. and Saunders, Ed and Kirk, Hannah Rose and
+               Margetts, Helen and Summerfield, Christopher},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20629034},
+  url       = {https://doi.org/10.5281/zenodo.20629034}
 }
 ```
 
@@ -30,7 +42,7 @@ runtime.
 ## 1. System requirements
 
 - **Operating system.** Any platform supporting R 4.4.3; developed and tested on macOS (Apple Silicon).
-- **Programming language.** R, version 4.4.3.
+- **Programming language.** R, version 4.4.3. Python 3 is *only* needed to re-run the optional elite-debater annotation step (`code/analysis/elite_debater/annotate.py --from-cache`); the full `make all` pipeline, which reproduces every reported result, is R-only and reads the committed `audit.csv` directly.
 - **Software dependencies.** All package dependencies are pinned to exact versions in `renv.lock` and restored automatically with `renv` (see the *Installation guide* below). No dependencies need be installed by hand.
 - **Non-standard hardware.** None required.
 
