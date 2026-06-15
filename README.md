@@ -1,5 +1,10 @@
 # AI systems out-persuade expert humans
 
+## Supplementary information
+
+The full Supplementary Information appendix for the paper is included at the
+repository root as [`SI_Appendix.pdf`](SI_Appendix.pdf).
+
 ## Citation
 
 If you use this code or data, please cite the paper and the archived repository.
@@ -15,17 +20,6 @@ This repository is permanently archived on Zenodo:
              Margetts, Helen and Summerfield, Christopher},
   year    = {2026}
 }
-
-@software{hackenburg2026archive,
-  title     = {AI systems out-persuade expert humans (code and de-identified data)},
-  author    = {Hackenburg, Kobi and Wagner, Caroline and Hewitt, Luke and
-               Tappin, Ben M. and Saunders, Ed and Kirk, Hannah Rose and
-               Margetts, Helen and Summerfield, Christopher},
-  year      = {2026},
-  publisher = {Zenodo},
-  doi       = {10.5281/zenodo.20629034},
-  url       = {https://doi.org/10.5281/zenodo.20629034}
-}
 ```
 
 Reproduction repository for the paper. The pipeline runs end to end from the
@@ -38,11 +32,6 @@ data/ ──► code/analysis/*.R ──► output/results/*.rds ──► code/
 Every script, data file, and configuration needed to reproduce the published
 results lives under this directory; nothing depends on a parent directory at
 runtime.
-
-## Supplementary information
-
-The full Supplementary Information appendix for the paper is included at the
-repository root as [`SI_Appendix.pdf`](SI_Appendix.pdf).
 
 ## 1. System requirements
 
