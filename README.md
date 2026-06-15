@@ -39,6 +39,11 @@ Every script, data file, and configuration needed to reproduce the published
 results lives under this directory; nothing depends on a parent directory at
 runtime.
 
+## Supplementary information
+
+The full Supplementary Information appendix for the paper is included at the
+repository root as [`SI_Appendix.pdf`](SI_Appendix.pdf).
+
 ## 1. System requirements
 
 - **Operating system.** Any platform supporting R 4.4.3; developed and tested on macOS (Apple Silicon).
@@ -129,6 +134,7 @@ remain reproducible from the cache with
 | `code/figures/`, `code/tables/` | R: `*.rds` → `output/figures/{main,si}` and `output/tables/{main,si}`. |
 | `output/` | Generated artefacts. Figures, tables, and `_numbers.json` are committed for convenience; fitted `*.rds` are gitignored and rebuilt by `make all`. |
 | `renv.lock`, `renv/`, `.Rprofile` | Pinned R environment (see *Environment* below). |
+| `SI_Appendix.pdf` | Supplementary Information appendix (typeset PDF) for the paper. |
 
 The `code/analysis/` and `data/` directories each contain a `README.md` with
 further detail; in particular, `data/README.md` describes the dataset structure,
