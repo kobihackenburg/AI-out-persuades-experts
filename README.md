@@ -7,18 +7,17 @@ repository root as [`SI_Appendix.pdf`](SI_Appendix.pdf).
 
 ## Citation
 
-If you use this code or data, please cite the paper and the archived repository.
-
-This repository is permanently archived on Zenodo:
-[https://doi.org/10.5281/zenodo.20629034](https://doi.org/10.5281/zenodo.20629034)
+If you use this code or data, please cite the paper:
 
 ```bibtex
-@article{hackenburg2026outpersuade,
-  title   = {AI systems out-persuade expert humans},
-  author  = {Hackenburg, Kobi and Wagner, Caroline and Hewitt, Luke and
-             Tappin, Ben M. and Saunders, Ed and Kirk, Hannah Rose and
-             Margetts, Helen and Summerfield, Christopher},
-  year    = {2026}
+@misc{hackenburg2026aisystemsoutpersuadeexpert,
+      title={AI systems out-persuade expert humans}, 
+      author={Kobi Hackenburg and Caroline Wagner and Luke Hewitt and Ben M. Tappin and Ed Saunders and Hannah Rose Kirk and Helen Margetts and Christopher Summerfield},
+      year={2026},
+      eprint={2606.16475},
+      archivePrefix={arXiv},
+      primaryClass={cs.CY},
+      url={https://arxiv.org/abs/2606.16475}, 
 }
 ```
 
