@@ -202,7 +202,7 @@ panel_b <- ggplot2::ggplot(panel_b_df,
     colour  = AI_RED
   ), r2_label_args)) +
   ggplot2::labs(
-    x = "Facts per conversation (log scale)",
+    x = "Claims per conversation (log scale)",
     # Two-line title prevents the rotated text from extending into the
     # top-left corner where the patchwork panel tag ("b") is rendered.
     y = "Estimated\npersuasive impact (pp)"

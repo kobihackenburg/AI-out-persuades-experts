@@ -57,7 +57,7 @@ subtitle <- sprintf(
     "rows give the Constrained AI and pooled Human contrasts in 0-100 ",
     "rating-scale points. Negative values indicate a lower rating than ",
     "unconstrained AI. For the bottom three items (anthropomorphism, ",
-    "deception, bias) a higher rating is unfavourable for the rated ",
+    "deception, bias) a higher rating is unfavorable for the rated ",
     "partner. p-values are uncorrected."),
   format(n_obs, big.mark = ",")
 )

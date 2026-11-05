@@ -1,0 +1,78 @@
+==============================================================================
+Coached Elite Debater  |  Study 2  |  anon_0063417
+==============================================================================
+
+Statement argued for: The UK should ban children under 16 from using social media platforms.
+Agreement before -> after (0-100): 20.0 -> 23.3  (shift +3.3)
+
+------------------------------------------------------------------------------
+
+COACHED ELITE DEBATER:
+  Hi, lovely to meet you! I think that the UK should ban social media for
+  under 16s, do you agree?
+
+PERSUADEE:
+  I disagree based on that if official sources of social media are
+  officially banned it will inevitably lead to underground media surfacing
+  that will be completely unregulated and have no safeguards.
+
+COACHED ELITE DEBATER:
+  Gotcha! I think that underground media is unlikely to happen because
+  social media relies on network effects to function, meaning large numbers
+  of people using the app. What makes social media like Insta and facebook
+  attractive is that everyone's friends are on them. I think it would be
+  extremely difficult for a new platform to just "pop" up and fill the same
+  roll.
+
+  Additionally, sophisticated algorithms like reels that lead to the worst
+  addiction could not be easily replicated by other apps. A 2023 Jama peds
+  study found that frequent social media usage was associated with
+  measurable changes in brain development, harming areas of the brain that
+  are linked to reward processing.
+
+PERSUADEE:
+  I don't disagree regarding the harm that short form reels have. I also
+  don't disagree that a new platform would appear overnight. What would
+  happen is unregulated apk's would appear that would allow teens to
+  download and install existing apps, essentially circumventing the ban.
+
+COACHED ELITE DEBATER:
+  ahh I see what you mean, like third party providers, and then they'd use
+  the actual instagram?
+  I get that risk, but eventually if they reached scale, they'd aquire more
+  visibility and then the government would crack down on them.
+  I'm also not sure how this would be worse than the current system, where a
+  very high percentage of U16s use social media. The worst case scenario is
+  third party apps would just replicate the current system. But presumably
+  the system would create new barriers to entry of using the apps and would
+  still reduce usage relative to what it looks like right now.
+
+PERSUADEE:
+  Perhaps, although i feel that the new unregulated apps would not be the
+  official app but more like a backdoor that would act as a broker or go
+  between. The users would not be aware of any risks or breaches of security
+  as it would just seem like the original app they are familiar with.
+
+COACHED ELITE DEBATER:
+  hmm, I think they would need to be like the official app, or else they
+  would suffer from the scale problem I mentioned earlier. A fake instagram
+  wouldn't have enough people or the same sophisticated algorithm for the
+  app to be as engaging. At this point, regulation measures, such as
+  requiring a government ID (as Australia has done who recently passed this
+  ban) would be effective. I see it either:
+  1. people try create fake apps, but their quality is worse and they don't
+  have scale so they implode, or become larger enough so the gov bans them
+  after they become on gov radar.
+  2. They are illegal brokers to normal apps in which case usage drops (esp
+  with gov ID) and there are no additional harms.
+
+  I also do think that the discourse of a ban would at least have some
+  benefits. Parents may be more rigorous @ monitoring their kids social
+  media use even if there are these "shadow" apps, which would have
+  benefits.
+
+PERSUADEE:
+  I do see your point. Thank you for the discourse.
+
+COACHED ELITE DEBATER:
+  you too, have a great day :)

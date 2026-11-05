@@ -12,8 +12,10 @@ data/study_X.jsonl  ──►  code/analysis/*.R  ──►  output/results/*.rd
                                                 ──►  output/results/_numbers.json
 ```
 
-Run order (enforced by the Makefile): the stage scripts `01`–`04` and the
-SI scripts `si_01`–`si_11` run first (in sorted order), then
+Run order (enforced by the Makefile): the Python scripts in `py/` run
+first (standard library only; they read `data/*.jsonl` and write CSVs to
+`output/results/_py/`, which some SI scripts read), then the stage scripts
+`01`–`04` and the SI scripts `si_*` (in sorted order), then
 `99_extract_numbers.R` runs **last** because it reads RDS produced by
 every other analysis script.
 
@@ -39,6 +41,24 @@ every other analysis script.
 | `si_09_fact_accuracy.R` | `study_{1,2,3}`, `canvasser_facts_vs_te` | `fact_accuracy_by_study`, `fact_accuracy_by_condition` | SI fact-accuracy tables |
 | `si_10_raw_per_persuader.R` | `study_{1,2}`, `limits_ai_reference` | `si_raw_per_persuader` | SI raw per-persuader BLUP table |
 | `si_11_repeat_participation.R` | `study_{0,1,2,3,4}` | `repeat_descriptives`, `repeat_overlap`, `repeat_issue_check`, `repeat_first_session`, `repeat_first_session_ai_minus`, `repeat_carryover`, `repeat_summary` | SI repeated-participation tables + body-text robustness |
+| `si_12_conversation_descriptives.R` | `study_{1,2,3,4}`, `_py/si_12_reply_times.csv` | `conversation_descriptives`, `conversation_median_turns` | SI conversation-descriptives table (turns, reply time, waiting share); body-text median turns |
+| `si_13_followup.R` | `study_{1,2,3,4}` (follow-up wave) | `followup_*` (sample, response, selection gap, AI vs human, by class, per study, retention, robustness, claims, Study 4 sample/results/robustness) | SI follow-up survey section; Results "Durability" paragraph, Methods "Follow-up survey" |
+| `si_14_claim_accuracy.R` | `study_{1,2}`, `mechanism_facts_vs_te`, `_py/si_14_claim_counts.csv` | `claim_accuracy_by_condition`, `claim_accuracy_r2`, `claim_accuracy_detection` | SI accurate-claims and accuracy-detection subsections; Results mechanism sentence |
+| `si_15_constrained_models.R` | `study_{1,2}` | `constrained_models_{desc,te,contrasts}` | SI Constrained AI by model |
+| `si_15_length_timing.R` | `study_{1,2}`, `_py/si_15_conversation_timing.csv` | `length_reply_{desc,coefs,lrt}`, `waiting_time_{desc,coefs}` | SI message length and reply time section |
+| `si_17_humanlike.R` | `study_{1,2,3}` | `humanness_{separation,coefs,bands,band_interaction}` | SI perceived humanness section |
+| `si_17_words_claims.R` | `study_{1,2}` | `claims_words_{desc,fits}` | SI claims vs words section; Results mechanism sentence |
+| `si_19_conviction_markers.R` | `study_{1,2}`, `_py/si_19_conviction_markers.csv` | `conviction_marker_means`, `conviction_gap_models` | SI linguistic markers of conviction; Results mechanism sentence |
+| `si_19_persuader_strategies.R` | `study_{1,2,3}`, `_py/si_19_strategy_reports.csv` | `strategy_*` (counts, mean ratings, top shares, permutation tests, validity, coaching shift, info-led coverage/TE/contrasts) | SI persuader strategies section; Results robustness sentence |
+| `si_21_opponents.R` | `study_{1,2,3}` | `crossover_{rates,ai_vs_human,te_by_class}`, `strong_opponents{,_knowledge}` | SI converting opponents and strong opponents; Results robustness sentence |
+| `si_23_matching_order.R` | `study_{1,2,3}`, `_py/si_23_timing.csv` | `matching_*` (rates, balance, balance tests, selection specs, unmatched reappear, start gap, wait models/specs), `persuader_load`, `persuader_order` | SI matchmaking and persuader order section; Methods sentence |
+| `py/si_12_reply_times.py` | `data/study_{1,2,3,4}.jsonl` | `_py/si_12_reply_times.csv` | human reply times (SI descriptives; Fig 3 inset delays via `02_mechanism.R`) |
+| `py/si_12_example_conversations.py` | `data/study_{2,4}.jsonl` | `output/example_conversations/`, `output/tables/si/tab_example_conversations.tex` | example conversations released in the repository (seeded outcome-blind draw) |
+| `py/si_14_claim_counts.py` | `data/study_{1,2}.jsonl` | `_py/si_14_claim_counts.csv` | inputs to `si_14_claim_accuracy.R` |
+| `py/si_15_conversation_timing.py` | `data/study_{1,2}.jsonl` | `_py/si_15_conversation_timing.csv` | inputs to `si_15_length_timing.R` |
+| `py/si_19_conviction_markers.py` | `data/study_{1,2}.jsonl` | `_py/si_19_conviction_markers.csv` | inputs to `si_19_conviction_markers.R` |
+| `py/si_19_strategy_reports.py` | `data/study_{1,2,3}.jsonl` | `_py/si_19_strategy_reports.csv` | inputs to `si_19_persuader_strategies.R` |
+| `py/si_23_timing.py` | `data/study_{1,2,3}.jsonl` | `_py/si_23_timing.csv` | inputs to `si_23_matching_order.R` |
 | `99_extract_numbers.R` | every `output/results/*.rds` + `elite_debater/audit.csv` | `_numbers.json`, per-cohort audit CSVs | every inline number in `manuscript.tex` / `SI.tex` |
 
 `elite_debater/` holds the one out-of-pipeline step (LLM annotation of
@@ -81,7 +101,7 @@ flow out of these flags:
 |---|---|---|
 | Assigned | every data row | `si_03_attrition.R` (pre-treatment dropout denominator) |
 | Matched | `successfully_matched == TRUE` | `si_03_attrition.R` (post-treatment attrition denominator) |
-| Complete case | matched **and** `!attrited` **and** non-NA `pre/post_attitude` | every outcome script (`01`–`04`, `si_01`, `si_02`, `si_06`–`si_11`, `99`) |
+| Complete case | matched **and** `!attrited` **and** non-NA `pre/post_attitude` | every outcome script (`01`–`04`, `si_01`, `si_02`, `si_06`–`si_11`, `si_13`–`si_23`, `99`) |
 
 `_setup.R::complete_case_filter()` is the single canonical implementation
 of the matched → complete-case step. Outcome scripts call it once at the

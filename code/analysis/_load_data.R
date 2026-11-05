@@ -94,7 +94,7 @@ COLUMN_SPEC <- tibble::tribble(
   "persuader_ideology_text",   "persuader/demographics/ideology_text",
   # persuader-side debater experience (Study 1 Elite Debaters only).
   # `debating_years` is free text; numeric parsing rules + free-text imputation
-  # live in code/analysis/99_extract_numbers.R (parse_debating_years()).
+  # live in code/analysis/_setup.R (parse_debating_years()).
   # `debating_achievements` is free text describing championship/finals/semis
   # claims; binary codes against the rubric in code/analysis/elite_debater/rubric.md
   # are produced by code/analysis/elite_debater/annotate.py and stored in

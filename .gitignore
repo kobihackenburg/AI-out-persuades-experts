@@ -1,13 +1,16 @@
 # Generated artefacts under output/.
 #
-# The figure + table deliverables (output/figures/**, output/tables/**) and the
-# numbers lookup (output/results/_numbers.json) ARE committed, so the published
-# figures and tables can be browsed on GitHub without installing R or running
-# the pipeline. The fitted-model objects (output/results/*.rds) and the JSONL
+# The figure + table deliverables (output/figures/**, output/tables/**,
+# output/source_data/**) and the numbers lookup (output/results/_numbers.json)
+# ARE committed, so the published figures and tables can be browsed on GitHub
+# without installing R or running the pipeline. The fitted-model objects (output/results/*.rds) and the JSONL
 # parse cache (output/results/_data/) are large and fully derivable from
 # data/ + code/, so they are not tracked.
 output/results/*.rds
 output/results/_data/
+# copies of data/derived/, and the timestamped Reddit report (make reddit)
+output/results/_py/
+output/results/reddit/
 
 # De-identification key produced by code/redact_data.R. It is not part of this
 # release; listed here as a safeguard so it can never be accidentally committed.

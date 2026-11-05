@@ -33,7 +33,7 @@ MOD_LABELS <- c(
   political_knowledge_n = "Political knowledge (0-4 correct)",
   # psychological scales
   dogmatism             = "Dogmatism scale",
-  empathic_trust        = "Empathic-trust scale",
+  empathic_trust        = "Epistemic-trust scale",
   ai_trust              = "AI-trust scale"
 )
 

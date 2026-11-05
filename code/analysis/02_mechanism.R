@@ -74,7 +74,7 @@
 #
 # Figure 3 panel B (facts vs persuasive impact):
 #   Aggregates `n_fact_claims` per condition and OLS-regresses TE on
-#   log10(fact density), reporting R^2 overall and within humans / AI. The
+#   log10(claim density), reporting R^2 overall and within humans / AI. The
 #   main-text version (mechanism_facts_vs_te / mechanism_facts_regression)
 #   uses the S1+S2-only TE inputs; the S1-S3 canvasser-inclusion analogue
 #   (canvasser_facts_vs_te / canvasser_facts_regression) backs the SI
@@ -102,18 +102,25 @@ PARTNER_ITEMS <- c(
 # Panel inset: response delay (seconds) per condition. Info-prompted
 # AI replies under ~1 s (no deliberation). The constrained AI's delay is
 # the mean of the truncated-normal sampler enforced by the experiment
-# platform (92 s) -- chosen to approximate the S1 Elite Debater realized
-# mean (95.0 s, computed from per-message timestamps; see manuscript
-# Mechanism section). Elite Debater (Study 1) and Coached Elite Debater
-# (Study 2) delays are realized means from per-message timestamps,
-# pinned here to the manuscript-cited values so the figure inset stays
-# stable across reruns. AI per-message `created_at` is a server-side
-# artifact and so cannot be used to estimate the realized AI delay
-# directly; the sampler mean is the actual design parameter of the
+# platform (92 s), chosen to approximate the S1 Elite Debater realized
+# mean. Elite Debater (Study 1) and Coached Elite Debater (Study 2)
+# delays are realized mean reply times from per-message timestamps,
+# read from code/analysis/py/si_12_reply_times.py's output (which the
+# Makefile runs before this script). AI per-message `created_at` is a
+# server-side artifact and so cannot be used to estimate the realized AI
+# delay directly; the sampler mean is the actual design parameter of the
 # condition. Words/msg is computed from data below.
+reply_times <- readr::read_csv(file.path(RESULTS_PY, "si_12_reply_times.csv"),
+                               show_col_types = FALSE)
+realized_delay_s <- function(study_id, class) {
+  x <- reply_times$reply_gap_s[reply_times$study == study_id &
+                               reply_times$persuader_class == class]
+  stopifnot(length(x) == 1L)
+  sprintf("%.0f", x)
+}
 PANEL_INSET_DELAYS_S <- list(
-  "Elite Debater"         = "95",
-  "Coached Elite Debater" = "95",
+  "Elite Debater"         = realized_delay_s("study_1", "elite_debater"),
+  "Coached Elite Debater" = realized_delay_s("study_2", "coached_elite_debater"),
   "AI"                    = "<1",
   "AI (Constrained)"      = "92"
 )
@@ -337,8 +344,8 @@ save_rds(mechanism_vs_coached_contrasts, "mechanism_vs_coached_contrasts")
 # Panel A text columns: avg words/message and response delay (s) per
 # condition. Words/msg is computed from the data subset used above
 # (per-row persuader_words divided by per-row n_persuader_msgs, then
-# averaged across rows in that arm); delay (s) is pinned to manuscript
-# values via PANEL_INSET_DELAYS_S. Four rows total: Elite Debater (S1),
+# averaged across rows in that arm); delay (s) comes from
+# PANEL_INSET_DELAYS_S. Four rows total: Elite Debater (S1),
 # Coached Elite Debater (S2), AI (Constrained) (S2), and AI (the new
 # footer reference: pooled across S1 and S2 since AI's words/delay
 # behaviour is essentially identical in the two studies). Order is

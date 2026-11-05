@@ -60,7 +60,7 @@ tbl_df <- per_model |>
 
 tbl <- gt::gt(tbl_df, groupname_col = "Variant") |>
   style_table(
-    title    = gt::md("**Constrained AI calibration -- target vs. realized per-model behaviour (Study 2).**"),
+    title    = gt::md("**Constrained AI calibration -- target vs. realized per-model behavior (Study 2).**"),
     subtitle = "Targets are the preregistered Elite Debater Study 1 means (51 words; 92 s). The realized per-model mean of approximately 55 words/msg sits ~4 words above target because the sampler draws each message length from a truncated normal centred on 51 and a lagged matching design adjusts upward when prior messages came in below target; the realized response delay (~92 s) tracks target exactly by design. Realized values are computed from conversation counts in the data on the Study 2 AI arms."
   ) |>
   gt::tab_options(row_group.font.weight = "bold")

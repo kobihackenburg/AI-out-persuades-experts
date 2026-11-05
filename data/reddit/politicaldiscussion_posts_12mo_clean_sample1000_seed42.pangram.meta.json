@@ -1,0 +1,18 @@
+{
+  "status": "complete",
+  "error": null,
+  "input": "data/politicaldiscussion_posts_12mo_clean_sample1000_seed42.jsonl",
+  "counts": {
+    "scored": 455
+  },
+  "skip_reasons": {},
+  "already_done": 545,
+  "units_submitted": 457,
+  "bulk_ids": [],
+  "pending_bulks": [],
+  "pending_tasks": [],
+  "batch_units": 1000,
+  "started_at": "2026-10-08T16:37:03+00:00",
+  "finished_at": "2026-10-08T16:53:43+00:00",
+  "scraper_version": "0.1.0"
+}

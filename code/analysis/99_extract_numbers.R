@@ -1109,37 +1109,8 @@ if (file.exists(debater_audit_path)) {
   }
 }
 
-# Elite-debater years + countries (computed directly from the data).
-# Years parsing rule: prefer bare-numeric self-reports; for entries that
-# combine "X years university, Y in school" or include school years
-# explicitly, use the total years of debating including school. This is
-# the rule that produces the manuscript's headline mean of 8.9 (a
-# first-number-only rule yields 8.8). Both rules are documented here so
-# any future change can be made deliberately.
-parse_debating_years <- function(s) {
-  if (is.na(s)) return(NA_real_)
-  s <- trimws(as.character(s))
-  if (s == "") return(NA_real_)
-  # Try strict numeric parse first (handles "10", "10.", "5.5").
-  num <- suppressWarnings(as.numeric(sub("[^0-9.].*$", "", s)))
-  if (!is.na(num) && grepl("^[0-9.]+\\s*$", s)) return(num)
-  if (!is.na(num) && grepl("^[0-9.]+\\s*\\.\\s*$", s)) return(num)
-  # Free-text cases. Pull out all integer-ish tokens.
-  nums <- as.numeric(stats::na.omit(unlist(regmatches(
-    s, gregexpr("[0-9]+(?:\\.[0-9]+)?", s)))))
-  nums <- nums[!is.na(nums) & nums > 0 & nums < 50]
-  if (length(nums) == 0L) return(NA_real_)
-  low <- tolower(s)
-  has_uni    <- grepl("universit|college|undergrad", low)
-  has_school <- grepl("\\bschool\\b|high school|high.?school", low)
-  # "4 university, 6 in school" -> sum the first two numbers (explicit split).
-  # Requires both keywords AND at least 2 numbers.
-  if (has_uni && has_school && length(nums) >= 2L) return(sum(nums[1:2]))
-  # Otherwise (incl. "15 (including school and university)" /
-  # "9 years including 2 years of high school" / "12 years.") -> take
-  # the first number, which the respondent reported as the total.
-  nums[1]
-}
+# Elite-debater years + countries (computed directly from the data). Years
+# are parsed with parse_debating_years() (_setup.R).
 
 # Load Study 1 via load_study() so the new persuader_debating_achievements
 # / persuader_debating_years columns from COLUMN_SPEC are present (cache
@@ -1309,9 +1280,21 @@ if (have_rds("repeat_summary")) {
   nums$repeat.pct_multi_session    <- rs$pct_multi_session
   nums$repeat.max_sessions_s1s3    <- as.integer(rs$max_sessions_s1s3)
   # Number of (persuadee, issue) pairs seen more than once across S1-S3.
-  # The design assigned a previously-unseen issue at each session; this is
-  # the realized count of exceptions (verification, not assumed = 0).
+  # The platform assigned a previously-unseen issue at each session within a
+  # study only, so almost all of these pairs span studies; the within-study
+  # count is the realized number of exceptions to that rule.
   nums$repeat.n_duplicate_issue_s1s3 <- as.integer(rs$n_duplicate_issue_s1s3)
+  nums$repeat.n_duplicate_issue_within_study_s1s3 <-
+    as.integer(rs$n_duplicate_issue_within_study_s1s3)
+}
+if (have_rds("repeat_session_caps")) {
+  caps <- load_rds("repeat_session_caps")
+  for (i in seq_len(nrow(caps))) {
+    key <- sprintf("repeat.sessions.%s", caps$study[i])
+    nums[[paste0(key, ".median")]]        <- caps$median_sessions[i]
+    nums[[paste0(key, ".n_over_five")]]   <- as.integer(caps$n_over_five[i])
+    nums[[paste0(key, ".pct_over_five")]] <- caps$pct_over_five[i]
+  }
 }
 if (have_rds("repeat_overlap")) {
   ov <- load_rds("repeat_overlap")
@@ -1352,6 +1335,171 @@ if (have_rds("repeat_carryover")) {
     nums <- emit_ci(nums, sprintf("repeat.carryover.%s", s$group),
                     s$estimate, s$lower_ci, s$upper_ci, s$p_value)
   }
+}
+
+# si_12 (R2.1, R2.5): append to code/analysis/99_extract_numbers.R before the
+# final write_json block.
+#
+# The main text cites median turns under the corrected definition (turn =
+# persuadee message + persuader reply = n_persuadee_msgs): Results Study 1
+# paragraph and Methods "median of 6 turns" (Studies 1-3), Study 4 "median 5
+# turns"; and the Results Constrained AI sentence "6.4 vs. 6.5 turns; Coached
+# Elite Debaters, 4.7" (Study 2 means, as in SI Table conversation_descriptives).
+# The existing dialogue.*.median_persuader_turns keys count persuader messages
+# and should no longer be cited for turns.
+
+# ---- conversation turns (si_12) -----------------------------------------
+if (have_rds("conversation_median_turns")) {
+  mt <- load_rds("conversation_median_turns")
+  for (i in seq_len(nrow(mt))) {
+    nums[[sprintf("dialogue.%s.median_turns", mt$block[i])]] <- mt$median_turns[i]
+  }
+}
+if (have_rds("conversation_descriptives")) {
+  s2 <- load_rds("conversation_descriptives") |>
+    dplyr::filter(study == "study_2") |>
+    dplyr::mutate(arm = ifelse(persuader_class == "ai" & dplyr::coalesce(ai_constrained, FALSE),
+                               "ai_constrained", persuader_class))
+  for (i in seq_len(nrow(s2))) {
+    nums[[sprintf("dialogue.s2.%s.mean_turns", s2$arm[i])]] <- s2$turns[i]
+  }
+}
+
+# ---- follow-up survey / durability (si_13) --------------------------------
+# Main-text "Durability" paragraph and Methods "Follow-up survey" paragraph.
+# Studies 1-3 counts are conversations on issues the persuadee discussed in a
+# single conversation (the analysed sample); intervals are conversation to
+# follow-up response, in days and in months (365.25 / 12 days).
+DAYS_PER_MONTH <- 365.25 / 12
+if (have_rds("followup_sample")) {
+  fs <- load_rds("followup_sample")
+  pooled <- fs[fs$study == "pooled S1-3", ]
+  nums$followup.s123.n_persuadees          <- as.integer(pooled$fu_persuadees)
+  nums$followup.s123.n_issues              <- as.integer(pooled$fu_rows)
+  nums$followup.s123.n_eligible_persuadees <- as.integer(pooled$persuadees)
+  nums$followup.s123.n_eligible_issues     <- as.integer(pooled$eligible_rows)
+  nums$followup.s123.pct_persuadees_returned <- 100 * pooled$fu_persuadees / pooled$persuadees
+  nums$followup.s123.pct_issues_returned     <- 100 * pooled$fu_rate
+  for (i in seq_len(nrow(fs))) {
+    key <- dplyr::recode(fs$study[i], `pooled S1-2` = "s12", `pooled S1-3` = "s123")
+    nums[[sprintf("followup.%s.median_gap_days", key)]]   <- fs$median_gap_days[i]
+    nums[[sprintf("followup.%s.median_gap_months", key)]] <- fs$median_gap_days[i] / DAYS_PER_MONTH
+    nums[[sprintf("followup.%s.min_gap_months", key)]]    <- fs$min_gap_days[i] / DAYS_PER_MONTH
+    nums[[sprintf("followup.%s.max_gap_months", key)]]    <- fs$max_gap_days[i] / DAYS_PER_MONTH
+  }
+}
+if (have_rds("followup_s4_sample")) {
+  s4s <- load_rds("followup_s4_sample")
+  nums$followup.s4.n_persuadees       <- as.integer(s4s$fu_rows_prereg_covariates)
+  nums$followup.s4.n_eligible         <- as.integer(s4s$rows_prereg_covariates)
+  nums$followup.s4.pct_returned       <- 100 * s4s$fu_rows_prereg_covariates / s4s$rows_prereg_covariates
+  nums$followup.s4.median_gap_days    <- s4s$median_gap_days
+  nums$followup.s4.median_gap_months  <- s4s$median_gap_days / DAYS_PER_MONTH
+}
+# AI and pooled human persuaders vs control, and AI minus human, immediately
+# and at follow-up in the same re-surveyed conversations.
+if (have_rds("followup_ai_vs_human")) {
+  g <- load_rds("followup_ai_vs_human")
+  keys <- c(`ai vs control, immediate`    = "ai.immediate",
+            `ai vs control, follow-up`    = "ai.follow_up",
+            `human vs control, immediate` = "human.immediate",
+            `human vs control, follow-up` = "human.follow_up",
+            `AI - human, immediate`       = "ai_minus_human.immediate",
+            `AI - human, follow-up`       = "ai_minus_human.follow_up")
+  for (s in names(keys)) {
+    r <- g[g$spec == s, ]
+    nums <- emit_ci(nums, paste0("followup.s123.", keys[[s]]),
+                    r$estimate, r$lower_ci, r$upper_ci, r$p_value)
+  }
+}
+# Share of each effect retained (follow-up / immediate), persuadee-clustered
+# bootstrap; p_value is the two-sided bootstrap p.
+if (have_rds("followup_retention")) {
+  ret <- load_rds("followup_retention")$lmm
+  for (q in c("retained_ai", "retained_human", "retained_diff")) {
+    r <- ret[ret$quantity == q, ]
+    nums <- emit_ci(nums, paste0("followup.s123.", q), r$estimate, r$lower_ci, r$upper_ci, r$p_two_sided)
+  }
+}
+if (have_rds("followup_s4_results")) {
+  r4 <- load_rds("followup_s4_results")
+  r <- r4[r4$wave == "follow-up" & r4$spec == "AI - canvasser", ]
+  nums <- emit_ci(nums, "followup.s4.ai_minus_canvasser.follow_up",
+                  r$estimate, r$lower_ci, r$upper_ci, r$p_value)
+}
+# "Return rates did not differ between AI and human conditions" (pp) and
+# "held under reweighting and bounding".
+if (have_rds("followup_response")) {
+  t123 <- load_rds("followup_response")$s123_tests
+  r <- t123[t123$spec == "response pp: AI - human", ]
+  nums <- emit_ci(nums, "followup.s123.return_ai_minus_human", r$estimate, r$lower_ci, r$upper_ci, r$p_value)
+  nums$followup.s123.return_joint_p <- t123$p_value[grepl("^joint Wald", t123$spec)]
+}
+if (have_rds("followup_robustness")) {
+  rob <- load_rds("followup_robustness")$s123
+  r <- rob[rob$spec == "inverse-probability-of-response weighted", ]
+  nums <- emit_ci(nums, "followup.s123.ipw_ai_minus_human", r$estimate, r$lower_ci, r$upper_ci, r$p_value)
+  r <- rob[rob$spec == "Lee bounds", ]
+  nums$followup.s123.lee_lower <- r$lower_ci
+  nums$followup.s123.lee_upper <- r$upper_ci
+}
+
+# ---- accurate vs inaccurate claims (si_14_claim_accuracy.R) --------------
+# R^2 of the Fig. 3b OLS (13 Studies 1-2 conditions, impact on log10 mean
+# claims per conversation) with accurate claims as the predictor; and the
+# conversation-level correlation of the share of inaccurate claims with the
+# "lied to me or made things up" rating (all persuaders).
+if (have_rds("claim_accuracy_r2")) {
+  car <- load_rds("claim_accuracy_r2")
+  nums$claim_accuracy.r2.accurate <- unname(car$r_squared[car$predictor == "accurate"])
+}
+if (have_rds("claim_accuracy_detection")) {
+  cad <- load_rds("claim_accuracy_detection") |>
+    dplyr::filter(subset == "all", x == "share_inaccurate", y == "rating_deception")
+  stopifnot(nrow(cad) == 1L)
+  nums$claim_accuracy.detection.r        <- cad$r
+  nums$claim_accuracy.detection.lower_ci <- cad$lower_ci
+  nums$claim_accuracy.detection.upper_ci <- cad$upper_ci
+}
+
+# ---- persuader strategies: information-led vs not (si_19) --------------
+# Results, robustness paragraph: share of human conversations in which the
+# persuader rated stories, partner's values, or open questions / reflective
+# listening above facts (main definition), AI's advantage over those
+# conversations, and their difference from information-led ones.
+if (have_rds("strategy_info_led_coverage")) {
+  cov <- load_rds("strategy_info_led_coverage") |>
+    dplyr::filter(definition == "main", persuader_class == "all_humans")
+  nums$strategy.non_info_led.pct_human_conversations <- 100 * cov$share_non_info_led
+}
+if (have_rds("strategy_info_led_contrasts")) {
+  sc <- load_rds("strategy_info_led_contrasts") |>
+    dplyr::filter(definition == "main")
+  for (i in seq_len(nrow(sc))) {
+    nums <- emit_ci(nums, sprintf("strategy.%s", sc$contrast[i]),
+                    sc$estimate[i], sc$lower_ci[i], sc$upper_ci[i], sc$p_value[i])
+  }
+}
+
+# ---- converting opponents (si_21) ---------------------------------------
+# Studies 1-3 persuadees who opposed the assigned stance (pre < 50): share
+# who crossed over to support it (post > 50), per class, and the range across
+# the five human classes. AI minus pooled human persuaders is from the linear
+# probability LMM with the human classes merged into one level.
+if (have_rds("crossover_rates")) {
+  cr <- load_rds("crossover_rates")
+  for (i in seq_len(nrow(cr))) {
+    nums[[sprintf("crossover.rate.%s", cr$group[i])]] <- cr$crossover_pct[i]
+    nums[[sprintf("crossover.n.%s",    cr$group[i])]] <- as.integer(cr$n[i])
+  }
+  hr <- cr$crossover_pct[!cr$group %in% c("control", "ai", "ai_constrained")]
+  nums$crossover.rate.human_min <- min(hr)
+  nums$crossover.rate.human_max <- max(hr)
+}
+if (have_rds("crossover_ai_vs_human")) {
+  cg <- load_rds("crossover_ai_vs_human") |> dplyr::filter(group == "ai_minus_human")
+  nums <- emit_ci(nums, "crossover.ai_minus_human",
+                  cg$estimate, cg$lower_ci, cg$upper_ci, cg$p_value)
 }
 
 dir.create(RESULTS, showWarnings = FALSE, recursive = TRUE)

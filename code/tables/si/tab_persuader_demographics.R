@@ -33,8 +33,7 @@ per_p <- humans |>
     gender           = dplyr::first(stats::na.omit(persuader_gender)),
     education        = dplyr::first(stats::na.omit(persuader_education)),
     ideology_text    = dplyr::first(stats::na.omit(persuader_ideology_text)),
-    debating_years   = suppressWarnings(as.numeric(
-                          dplyr::first(stats::na.omit(persuader_debating_years)))),
+    debating_years   = parse_debating_years(dplyr::first(stats::na.omit(persuader_debating_years))),
     prep_hours       = suppressWarnings(as.numeric(
                           dplyr::first(stats::na.omit(persuader_study_prep_time)))),
     .groups = "drop"

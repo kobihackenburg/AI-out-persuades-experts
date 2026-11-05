@@ -1,47 +1,16 @@
 # tab_conversation_descriptives.R
 # SI Table: per-condition conversation descriptive statistics (turns,
 # duration, words per persuader / persuadee message, persuader words per
-# conversation). Backs the manuscript's claim that "treatment dialogues
-# lasted 6.7 turns and 16 minutes on average".
+# conversation, and for human persuaders the mean reply time and share of the
+# conversation spent awaiting the persuader's reply).
+# Reads RDS written by code/analysis/si_12_conversation_descriptives.R.
 
 source(here::here("code/analysis/_setup.R"))
-source(here::here("code/analysis/_load_data.R"))
 source(here::here("code/tables/table_style.R"))
 
 message("\n==== code/tables/si/tab_conversation_descriptives.R ====")
 
-studies <- load_studies(c("study_1", "study_2", "study_3", "study_4"))
-
-bound <- dplyr::bind_rows(
-  studies$study_1 |> dplyr::mutate(study = "study_1"),
-  studies$study_2 |> dplyr::mutate(study = "study_2"),
-  studies$study_3 |> dplyr::mutate(study = "study_3"),
-  studies$study_4 |> dplyr::mutate(study = "study_4")
-)
-
-per_arm <- bound |>
-  dplyr::filter(dplyr::coalesce(successfully_matched, FALSE),
-                !dplyr::coalesce(attrited, FALSE),
-                !is.na(persuader_class),
-                !is.na(n_persuader_msgs), n_persuader_msgs > 0L,
-                !is.na(conv_duration_s),  conv_duration_s > 0) |>
-  dplyr::mutate(
-    persuader_wpm = persuader_words / n_persuader_msgs,
-    persuadee_wpm = persuadee_words / pmax(n_persuadee_msgs, 1L)
-  ) |>
-  dplyr::group_by(study, persuader_class, ai_constrained) |>
-  dplyr::summarise(
-    n_conv          = dplyr::n(),
-    # A turn = one persuader message + one persuadee message (two messages),
-    # so turns = n_messages / 2 (matches the main text and "6.7 turns" claim).
-    turns           = mean(n_messages, na.rm = TRUE) / 2,
-    duration_min    = mean(conv_duration_s, na.rm = TRUE) / 60,
-    persuader_wpm   = mean(persuader_wpm, na.rm = TRUE),
-    persuadee_wpm   = mean(persuadee_wpm, na.rm = TRUE),
-    persuader_total = mean(persuader_words, na.rm = TRUE),
-    persuadee_total = mean(persuadee_words, na.rm = TRUE),
-    .groups = "drop"
-  )
+per_arm <- load_rds("conversation_descriptives")
 
 CONDITION_LABEL <- function(cls, constrained) {
   base <- unname(PERSUADER_CLASS_LABELS[as.character(cls)])
@@ -58,18 +27,35 @@ tbl_df <- per_arm |>
     `Duration (min)`          = sprintf("%.1f", duration_min),
     `Words per persuader msg` = sprintf("%.0f", persuader_wpm),
     `Words per persuadee msg` = sprintf("%.0f", persuadee_wpm),
-    `Persuader words per conv` = sprintf("%.0f", persuader_total)
+    `Persuader words per conv` = sprintf("%.0f", persuader_total),
+    `Mean reply time (s)` = ifelse(is.na(reply_time_s), "",
+                                   sprintf("%.0f", reply_time_s)),
+    `Share of conversation awaiting persuader reply` =
+      ifelse(is.na(share_awaiting), "", sprintf("%.0f%%", 100 * share_awaiting))
   ) |>
   dplyr::arrange(Study, match(persuader_class, PERSUADER_CLASS_ORDER),
                  dplyr::desc(ai_constrained)) |>
   dplyr::select(Study, Condition, n, Turns, `Duration (min)`,
                 `Words per persuader msg`, `Words per persuadee msg`,
-                `Persuader words per conv`)
+                `Persuader words per conv`, `Mean reply time (s)`,
+                `Share of conversation awaiting persuader reply`)
+
+# ADDEDBEGIN / ADDEDEND are swapped for \added{...} after gt has escaped the text.
+NEW_CAPTION <- paste(
+  "ADDEDBEGIN",
+  "A turn is one exchange: a persuadee message and the persuader's reply.",
+  "Reply time is the interval between a persuadee message and the persuader's reply,",
+  "excluding the persuader's prepared opening message.",
+  "The share of conversation awaiting persuader reply is the persuader's total time to reply,",
+  "including the opening message, divided by conversation duration.",
+  "Both are reported for human persuaders only.",
+  "ADDEDEND"
+)
 
 tbl <- gt::gt(tbl_df, groupname_col = "Study") |>
   style_table(
     title    = gt::md("**Conversation descriptive statistics by study and condition.**"),
-    subtitle = "Means across complete-case conversations."
+    subtitle = paste("Means across complete-case conversations.", NEW_CAPTION)
   ) |>
   gt::tab_options(row_group.font.weight = "bold")
 
@@ -87,6 +73,13 @@ txt <- gsub("\\\\textbf\\{Words per persuadee msg\\}",
             "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Words per \\\\\\\\ persuadee msg}}}", txt)
 txt <- gsub("\\\\textbf\\{Persuader words per conv\\}",
             "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Persuader words \\\\\\\\ per conv}}}", txt)
+txt <- gsub("\\\\textbf\\{Mean reply time \\(s\\)\\}",
+            "\\\\textbf{\\\\added{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Mean reply \\\\\\\\ time (s)}}}}", txt)
+txt <- gsub("\\\\textbf\\{Share of conversation awaiting persuader reply\\}",
+            "\\\\textbf{\\\\added{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Share of \\\\\\\\ conversation \\\\\\\\ awaiting \\\\\\\\ persuader reply}}}}", txt)
+txt <- sub("^\\\\centering$", "\\\\centering\n\\\\setlength{\\\\tabcolsep}{4pt}", txt)
+txt <- gsub("ADDEDBEGIN ", "\\\\added{", txt)
+txt <- gsub(" ADDEDEND", "}", txt)
 writeLines(txt, tex_path, useBytes = FALSE)
 
 message("  done.")

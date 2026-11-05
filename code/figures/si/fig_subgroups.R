@@ -51,7 +51,7 @@ SUBGROUP_SPEC <- tibble::tribble(
   "political_knowledge_hi", "Knowledge &\nattitudes",  "Political knowledge (binary)",
   # Psychological
   "mod_dogmatism",         "Psychological",           "Dogmatism (binary)",
-  "empathic_trust_high",   "Psychological",           "Empathic trust (binary)",
+  "empathic_trust_high",   "Psychological",           "Epistemic trust (binary)",
   "ai_trust_high",         "Psychological",           "AI trust (binary)"
 )
 
@@ -84,8 +84,8 @@ LEVEL_LABELS <- list(
                           agree    = "Initial agreers"),
   mod_issue_knowledge = c(low = "Lower knowledge", high = "Higher knowledge"),
   mod_dogmatism       = c(low = "Lower dogmatism", high = "Higher dogmatism"),
-  empathic_trust_high = c(low = "Lower empathic trust",
-                          high = "Higher empathic trust"),
+  empathic_trust_high = c(low = "Lower epistemic trust",
+                          high = "Higher epistemic trust"),
   ai_trust_high       = c("FALSE" = "Lower AI trust",
                           "TRUE"  = "Higher AI trust"),
   political_knowledge_hi = c("FALSE" = "Lower political knowledge",

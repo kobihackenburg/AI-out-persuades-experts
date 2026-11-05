@@ -1,9 +1,13 @@
 # data/
 
 The de-identified, analysis-ready dataset for the project: cleaned JSONL files
-for the five analysed study slices, plus the per-claim fact-check CSVs. Every
-result, figure, table, and inline number in the manuscript and SI is derived
-from the files in this folder.
+for the five analysed study slices, the per-claim fact-check CSVs, the
+follow-up survey, the inputs derived from message text, the example
+conversations and the Reddit scores. Every result, figure, table, and inline
+number in the manuscript and SI is derived from the files in this folder.
+
+**The conversation transcripts are not included** (personal data, and dual-use risk; see *Conversation transcripts* in
+the top-level `README.md`). Measures computed from them ship as computed.
 
 This is a privacy-preserving export: it contains only the fields the analysis
 pipeline reads, with participant/session identifiers pseudonymised and free
@@ -17,6 +21,11 @@ transformation.
 |---|---|
 | `study_{0,1,2,3,4}.jsonl` | Cleaned conversations for each study (one row per persuadee-side conversation), restricted to analysis fields. |
 | `fact_checks/study_{1..4}/<role>_MAIN_fact_checks.csv` | Per-claim fact-check output (one row per extracted claim), reduced to the pseudonymous `chat_session_id` and the 0-100 `veracity_score` read by `code/analysis/si_09_fact_accuracy.R`. Per-session claim counts and mean veracity are already embedded in the `study_X.jsonl` rows. |
+| `final_followup_data/followup_blocks.csv` | One row per follow-up block (a persuadee re-surveyed about one issue): renumbered `block_id`, the pseudonymous `row_id` of the conversation (single-exposure blocks only; it matches `row_id` in `study_X.jsonl`), `exposure_pattern`, `skipped` and the timestamps used for the time since the conversation. Read by `code/analysis/si_13_followup.R`. |
+| `final_followup_data/followup_items.csv` | The block's responses, long format (`block_id`, `item_id`, `value_raw`): the three attitude items (Studies 1-3) or the donation amount (Study 4). |
+| `derived/*.csv`, `derived/tab_example_conversations.tex` | Outputs of `code/analysis/py/*.py`, which read message text (claim counts, reply and conversation timing, conviction markers, strategy reports, the example-conversation draw). Keys (`row_id`, `persuadee_session`) are pseudonymised. `make results` copies them to `output/results/_py/` and `output/tables/si/`. |
+| `example_conversations/` | The 24 example transcripts from the SI (`transcripts/*.txt`) and their `manifest.csv` (study, persuader, issue and statement, attitudes before and after, donation outcomes for Study 4, pseudonymous `row_id`). |
+| `reddit/` | Pangram scores for 1,000 r/PoliticalDiscussion posts, without post text; see `reddit/README.md`. |
 
 Each `study_X.jsonl` row is one randomized persuadee session. Subsetting to the
 right analytical sample is done at analysis time using explicit per-row flags,
@@ -68,3 +77,11 @@ ICH-E9 single-source-of-truth pattern.
 | `study_2` | 4,955 |
 | `study_3` | 2,930 |
 | `study_4` | 3,803 |
+
+## Follow-up survey
+
+In September 2026 all persuadees from Studies 1-4 were invited to a follow-up
+survey (see the manuscript's Methods). `si_13_followup.R` analyses blocks with
+`exposure_pattern == "single"` (the persuadee discussed that issue in exactly
+one conversation) that were not skipped; blocks for issues discussed more than
+once carry no `row_id`, since they cannot be tied to one conversation.

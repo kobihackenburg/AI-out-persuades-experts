@@ -25,6 +25,15 @@ force_here <- function(name) {
   writeLines(txt, tex_path, useBytes = FALSE)
 }
 
+# gt escapes backslashes in captions, so revision markup is added post-write.
+mark_added <- function(name, phrase) {
+  tex_path <- file.path(TABLES_SI, paste0(name, ".tex"))
+  txt <- readLines(tex_path, encoding = "UTF-8")
+  if (!any(grepl(phrase, txt, fixed = TRUE))) stop("mark_added: phrase not found in ", name)
+  txt <- sub(phrase, paste0("\\\\added{", phrase, "}"), txt)
+  writeLines(txt, tex_path, useBytes = FALSE)
+}
+
 # ---- Panel 1: sessions-per-persuadee distribution -----------------------
 desc <- load_rds("repeat_descriptives")
 
@@ -46,13 +55,14 @@ sessions_df <- desc |>
 tbl_sessions <- gt::gt(sessions_df) |>
   style_table(
     title    = gt::md("**Repeated participation: sessions per persuadee, by study.**"),
-    subtitle = "Columns 1-5+ count unique persuadees in each study's analytic sample who completed exactly that many conversations (5+ pools five or more). Persuadees gives the total unique persuadees, Conversations the total retained conversations, and Mean / Max the per-persuadee session count. Studies 1-3 assigned a new, previously-unseen issue at each session; Study 4 was a single-session donation design."
+    subtitle = "Columns 1-5+ count unique persuadees in each study's analytic sample who completed exactly that many conversations (5+ pools five or more). Persuadees gives the total unique persuadees, Conversations the total retained conversations, and Mean / Max the per-persuadee session count. Studies 1-3 assigned a new, previously-unseen issue at each session within a study; Study 4 was a single-session donation design."
   )
 
 save_table(tbl_sessions, "tab_repeat_participation", TABLES_SI,
            label  = "tab:repeat_participation",
            layout = "auto")
 force_here("tab_repeat_participation")
+mark_added("tab_repeat_participation", "within a study")
 
 # ---- Panel 2: cross-study persuadee-overlap matrix ----------------------
 overlap <- load_rds("repeat_overlap")

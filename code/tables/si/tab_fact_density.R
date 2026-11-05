@@ -17,7 +17,7 @@ tbl_df <- fc |>
     Type             = type,
     Study            = study,
     `n conv`         = format(n_conv, big.mark = ","),
-    `Facts / conv`   = sprintf("%.1f", mean_fact_claims),
+    `Claims / conv`  = sprintf("%.1f", mean_fact_claims),
     `Estimate (pp)`  = sprintf("%+.2f", estimate),
     `95% CI`         = sprintf("[%+.2f, %+.2f]", lower_ci, upper_ci)
   )
@@ -40,8 +40,8 @@ txt <- gsub("\\\\begin\\{tabular\\*\\}\\{\\\\linewidth\\}\\{@\\{\\\\extracolsep\
 txt <- gsub("\\\\end\\{tabular\\*\\}", "\\\\end{tabular}", txt)
 txt <- gsub("\\\\textbf\\{n conv\\}",
             "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{n \\\\\\\\ conv}}}", txt)
-txt <- gsub("\\\\textbf\\{Facts / conv\\}",
-            "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Facts / \\\\\\\\ conv}}}", txt)
+txt <- gsub("\\\\textbf\\{Claims / conv\\}",
+            "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Claims / \\\\\\\\ conv}}}", txt)
 txt <- gsub("\\\\textbf\\{Estimate \\(pp\\)\\}",
             "\\\\textbf{\\\\raisebox{-0.5\\\\height}{\\\\shortstack{Estimate \\\\\\\\ (pp)}}}", txt)
 txt <- gsub("\\\\begin\\{table\\}\\[!t\\]", "\\\\begin{table}[H]", txt)

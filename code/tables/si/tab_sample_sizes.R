@@ -55,7 +55,7 @@ tbl_df <- per_arm |>
 tbl <- gt::gt(tbl_df, groupname_col = "Study") |>
   style_table(
     title    = gt::md("**Per-condition sample sizes by study.**"),
-    subtitle = "Assigned persuadees are those allocated to the condition by the platform's randomiser. Matched persuadees are those who were successfully paired with a partner in real time and exposed to treatment. Final persuadees are matched persuadees with a non-missing primary outcome (post-treatment attitude in Studies 1-3; donation amount in Study 4). Assigned exceeds Matched because persuadees who entered matchmaking but were not paired (e.g., no partner came online in their slot) had not yet seen any treatment and remained eligible to re-enter the study."
+    subtitle = "Assigned persuadees are those allocated to the condition by the platform's randomizer. Matched persuadees are those who were successfully paired with a partner in real time and exposed to treatment. Final persuadees are matched persuadees with a non-missing primary outcome (post-treatment attitude in Studies 1-3; donation amount in Study 4). Assigned exceeds Matched because persuadees who entered matchmaking but were not paired (e.g., no partner came online in their slot) had not yet seen any treatment and remained eligible to re-enter the study."
   ) |>
   gt::tab_options(row_group.font.weight = "bold")
 

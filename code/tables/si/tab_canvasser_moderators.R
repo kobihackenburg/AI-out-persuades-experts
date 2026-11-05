@@ -25,7 +25,7 @@ MOD_LABELS <- c(
   ideology_coded        = "Ideology (0 = Left, 4 = Right)",
   political_knowledge_n = "Political knowledge (0-4 correct)",
   dogmatism             = "Dogmatism scale",
-  empathic_trust        = "Empathic-trust scale",
+  empathic_trust        = "Epistemic-trust scale",
   ai_trust              = "AI-trust scale"
 )
 

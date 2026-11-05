@@ -74,14 +74,17 @@ tbl_df <- raw_tbl |>
   )
 
 vc <- as.data.frame(lme4::VarCorr(m))
+re_sd <- setNames(vc$sdcor, vc$grp)
 n_per <- lme4::ngrps(m)[["persuader"]]
 n_pee <- lme4::ngrps(m)[["persuadee"]]
+re_sentence <- sprintf("Random-intercept standard deviations: persuader %.2f, persuadee %.2f; residual standard deviation %.2f.",
+                       re_sd[["persuader"]], re_sd[["persuadee"]], re_sd[["Residual"]])
 
 tbl <- gt::gt(tbl_df) |>
   style_table(
     title    = gt::md("**Pooled S1-S3 LMM -- full fixed-effects coefficient table.**"),
-    subtitle = sprintf("Fixed effects from a linear mixed-effects model regressing post-treatment attitude on pre-treatment attitude, policy issue, persuader-class group, and attempt number, with crossed random intercepts for persuader and persuadee. Reference levels are Control for Group (so each Group coefficient is the per-class average treatment effect vs. Control) and the alphabetically first issue, physician-assisted suicide, for Issue; each non-reference coefficient is the mean difference vs. that reference, holding all other covariates fixed. N obs = %d; n_persuader = %d; n_persuadee = %d. Random-effects standard deviations are reported in the SI prose above.",
-                       nobs(m), n_per, n_pee)
+    subtitle = sprintf("Fixed effects from a linear mixed-effects model regressing post-treatment attitude on pre-treatment attitude, policy issue, persuader-class group, and attempt number, with crossed random intercepts for persuader and persuadee. Reference levels are Control for Group (so each Group coefficient is the per-class average treatment effect vs. Control) and the alphabetically first issue, physician-assisted suicide, for Issue; each non-reference coefficient is the mean difference vs. that reference, holding all other covariates fixed. N obs = %d; n_persuader = %d; n_persuadee = %d. %s",
+                       nobs(m), n_per, n_pee, re_sentence)
   )
 
 save_table(tbl, "tab_pooled_lmm_coefs", TABLES_SI,
@@ -91,6 +94,8 @@ save_table(tbl, "tab_pooled_lmm_coefs", TABLES_SI,
 tex_path <- file.path(TABLES_SI, "tab_pooled_lmm_coefs.tex")
 txt <- readLines(tex_path, encoding = "UTF-8")
 txt <- gsub("\\\\begin\\{table\\}\\[!t\\]", "\\\\begin{table}[H]", txt)
+if (!any(grepl(re_sentence, txt, fixed = TRUE))) stop("random-effect sentence not found in caption")
+txt <- sub(re_sentence, paste0("\\added{", re_sentence, "}"), txt, fixed = TRUE)
 writeLines(txt, tex_path, useBytes = FALSE)
 
 message("  done.")

@@ -1,0 +1,64 @@
+{
+  "status": "complete",
+  "error": null,
+  "items_written": 10348,
+  "items_dropped": {},
+  "first_item_at": "2025-10-08T01:52:46+00:00",
+  "last_item_at": "2026-10-07T22:51:24+00:00",
+  "started_at": "2026-10-08T14:33:51+00:00",
+  "finished_at": "2026-10-08T14:39:07+00:00",
+  "subreddit": "PoliticalDiscussion",
+  "limit": null,
+  "since": "2025-10-08T00:00:00+00:00",
+  "until": "2026-10-08T00:00:00+00:00",
+  "content_type": "posts",
+  "source": "arctic_shift",
+  "order": "oldest",
+  "listings": null,
+  "scannable_only": false,
+  "scraper_version": "0.1.0",
+  "merged_from": [
+    {
+      "since": "2025-10-08T00:00:00+00:00",
+      "until": "2026-04-08T00:00:00+00:00",
+      "items_written": 6148,
+      "started_at": "2026-10-08T14:33:51+00:00",
+      "finished_at": "2026-10-08T14:39:07+00:00"
+    },
+    {
+      "since": "2026-04-08T00:00:00+00:00",
+      "until": "2026-10-08T00:00:00+00:00",
+      "items_written": 4200,
+      "started_at": "2026-10-08T14:29:30+00:00",
+      "finished_at": "2026-10-08T14:32:43+00:00"
+    }
+  ],
+  "cleaning": {
+    "cleaned_from": "data/politicaldiscussion_posts_12mo.jsonl",
+    "items": 10348,
+    "items_changed": 707,
+    "items_emptied": 1,
+    "cleaned_at": "2026-10-08T14:39:33+00:00",
+    "cleaner_version": "0.1.0"
+  },
+  "sampling": {
+    "sampled_from": "data/politicaldiscussion_posts_12mo_clean.jsonl",
+    "items_in_source": 10348,
+    "items_eligible": 1197,
+    "items_sampled": 1000,
+    "seed": 42,
+    "sampled_at": "2026-10-08T14:41:37+00:00",
+    "sampler_version": "0.1.0"
+  },
+  "release": {
+    "usernames_removed": true,
+    "rule": "author set to null for every row except the values AutoModerator (a bot) and [deleted] (a placeholder)",
+    "kept_values": [
+      "AutoModerator",
+      "[deleted]"
+    ],
+    "rows_nulled": 1000,
+    "exported_from": "p4_pangram commit 0cd2926, data/politicaldiscussion_posts_12mo_clean_sample1000_seed42.jsonl",
+    "exported_at": "2026-10-30T12:02:30+00:00"
+  }
+}

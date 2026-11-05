@@ -81,7 +81,7 @@ build_pooled <- function(study_labels) {
       age_bucket          = factor(dplyr::case_when(
                                       age < 30 ~ "<30",
                                       age < 50 ~ "30-49",
-                                      TRUE     ~ "50+")),
+                                      age >= 50 ~ "50+")),
       empathic_trust_high = factor(ifelse(empathic_trust >
                                             stats::median(empathic_trust, na.rm = TRUE),
                                           "high", "low"))
@@ -174,7 +174,7 @@ MODERATORS <- tibble::tribble(
   "ideology_coded",          "continuous",   "Ideology (0 = Left, 4 = Right)",
   "political_knowledge_n",   "continuous",   "Political knowledge (0-4 correct)",
   "dogmatism",               "continuous",   "Dogmatism scale",
-  "empathic_trust",          "continuous",   "Empathic-trust scale",
+  "empathic_trust",          "continuous",   "Epistemic-trust scale",
   "ai_trust",                "continuous",   "AI-trust scale"
 )
 

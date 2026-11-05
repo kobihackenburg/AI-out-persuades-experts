@@ -3,17 +3,22 @@
 # Repeated-participation due-diligence analyses.
 #
 # Persuadees could complete multiple sessions (up to five in Studies 1-3,
-# each on a new issue) and the same Prolific IDs recur across studies. This
-# script documents that multiplicity and shows the headline pooled result is
-# not an artefact of it.
+# each on a new issue within that study) and the same Prolific IDs recur
+# across studies. The platform's never-same-issue rule applied within a study
+# only, so persuadees who took part in several of Studies 1-3 could discuss
+# the same issue again. This script documents that multiplicity and shows the
+# headline pooled result is not an artefact of it.
 #
 # Outputs (under output/results/, consumer after `->`):
 #   repeat_descriptives.rds         -> tab_repeat_participation (sessions panel)
 #   repeat_overlap.rds              -> tab_repeat_participation (overlap panel)
 #                                      + 99_extract_numbers (cross-study counts)
-#   repeat_issue_check.rds          -> 99_extract_numbers (never-same-issue check)
+#   repeat_issue_check.rds          -> 99_extract_numbers (within-study check)
+#   repeat_issue_extent.rds         -> 99_extract_numbers (same-issue repeats
+#                                      across S1-S3)
 #   repeat_first_session.rds        -> tab_repeat_robustness (first-session column)
 #   repeat_first_session_ai_minus.rds -> 99_extract_numbers (AI-minus-human, S1)
+#   repeat_ai_minus_human.rds       -> tab_repeat_robustness (AI-minus-human table)
 #   repeat_carryover.rds            -> tab_repeat_robustness (attempt-slope column)
 #                                      + 99_extract_numbers (interaction LRT)
 #   repeat_summary.rds              -> 99_extract_numbers (headline scalars)
@@ -21,7 +26,9 @@
 # Scope:
 #   * Descriptives + cross-study overlap span all five studies (S0 the
 #     selection tournament, S1-S3 attitude studies, S4 donations).
-#   * The never-same-issue verification covers the issue-varying studies.
+#   * The within-study never-same-issue check covers the issue-varying
+#     studies; the cross-study check and the AI-minus-human refits cover the
+#     pooled S1-S3 attitude studies.
 #   * First-session-only and attempt x treatment carryover refits use the
 #     pooled S1-S3 attitude frame only (Study 4 is single-session by design,
 #     so it cannot contribute to a repeated-measures robustness check).
@@ -35,6 +42,10 @@ message("\n==== si_11_repeat_participation.R ====")
 
 ALL_STUDIES <- c("study_0", "study_1", "study_2", "study_3", "study_4")
 ISSUE_STUDIES <- c("study_0", "study_1", "study_2", "study_3")  # S4 has one target
+POOLED_STUDIES <- c("study_1", "study_2", "study_3")
+
+lmm_control <- lme4::lmerControl(optimizer = "bobyqa",
+                                 optCtrl   = list(maxfun = 100000))
 
 # =============================================================================
 # 1. Per-study analytic samples (complete-case persuadee sessions)
@@ -109,6 +120,17 @@ repeat_descriptives <- repeat_descriptives |>
 
 save_rds(repeat_descriptives, "repeat_descriptives")
 
+# The intended per-study maximum was five sessions; a minority completed more.
+repeat_session_caps <- session_counts |>
+  dplyr::group_by(study) |>
+  dplyr::summarise(
+    median_sessions = stats::median(n_sessions),
+    n_over_five     = sum(n_sessions > 5L),
+    pct_over_five   = 100 * mean(n_sessions > 5L),
+    .groups = "drop"
+  )
+save_rds(repeat_session_caps, "repeat_session_caps")
+
 message("  sessions-per-persuadee distribution:")
 print(repeat_descriptives)
 
@@ -167,13 +189,13 @@ message("  overlap matrix:")
 print(overlap_matrix)
 
 # =============================================================================
-# 4. Verification: never randomized to the same issue twice
+# 4. Verification: never randomized to the same issue twice within a study
 # =============================================================================
 # For each issue-varying study and persuadee, the maximum number of sessions
-# on any single issue should be 1 (the design assigned returning persuadees a
-# new, previously-unseen stance each time). We report, per study, the number
-# of (persuadee, issue) pairs seen more than once (expected 0) and the max
-# distinct issues a persuadee saw.
+# on any single issue should be 1 (within a study, the design assigned
+# returning persuadees a new, previously-unseen stance each time). We report,
+# per study, the number of (persuadee, issue) pairs seen more than once
+# (expected 0) and the max distinct issues a persuadee saw.
 repeat_issue_check <- sessions |>
   dplyr::filter(study %in% ISSUE_STUDIES, !is.na(issue), issue != "NA") |>
   dplyr::group_by(study, persuadee, issue) |>
@@ -190,8 +212,77 @@ repeat_issue_check <- sessions |>
 
 save_rds(repeat_issue_check, "repeat_issue_check")
 
-message("  never-same-issue verification:")
+message("  never-same-issue verification (within study):")
 print(repeat_issue_check)
+
+# =============================================================================
+# 4b. Same-issue repeats across Studies 1-3
+# =============================================================================
+# The rule above did not carry across studies, so a persuadee could meet the
+# same issue again in a later study. One row per retained S1-S3 conversation,
+# with the persuadee's sessions ordered across studies (`attempt_global`;
+# `attempt` restarts at 1 in each study) and each conversation's exposure
+# number on its issue. `persuader` and `attempt` are coded as in
+# 01_main_attitudes.R; `group3` pools the five human classes and keeps
+# Constrained AI separate from (unconstrained) AI.
+issue_df <- purrr::imap_dfr(studies[POOLED_STUDIES], ~ dplyr::mutate(.x, study = .y)) |>
+  complete_case_filter(label = "si_11 cross-study issues") |>
+  dplyr::transmute(
+    study, session_completed_at,
+    persuadee = persuadee_id,
+    persuader = dplyr::case_when(
+      !is.na(persuader_id)                            ~ persuader_id,
+      persuader_class == "ai" & !is.na(ai_model_full) ~ paste0("ai_", ai_model_full),
+      TRUE                                            ~ paste0("solo_", persuadee_session)
+    ),
+    issue = issue_id, pre = pre_attitude, post = post_attitude,
+    attempt = dplyr::coalesce(as.integer(persuadee_attempt_number), 1L),
+    group = dplyr::case_when(
+      persuader_class == "ai" & dplyr::coalesce(ai_constrained, FALSE) ~ "ai_constrained",
+      TRUE ~ as.character(persuader_class)
+    ),
+    group3 = dplyr::case_when(group %in% c("control", "ai", "ai_constrained") ~ group,
+                              TRUE ~ "human")
+  ) |>
+  dplyr::arrange(persuadee, study, session_completed_at) |>
+  dplyr::group_by(persuadee) |>
+  dplyr::mutate(attempt_global = dplyr::row_number()) |>
+  dplyr::group_by(persuadee, issue) |>
+  dplyr::mutate(n_on_issue = dplyr::n(), exposure = dplyr::row_number()) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(repeated_issue = n_on_issue > 1L, repeat_exposure = exposure > 1L)
+
+repeat_pairs <- issue_df |>
+  dplyr::filter(repeated_issue) |>
+  dplyr::group_by(persuadee, issue) |>
+  dplyr::summarise(studies      = paste(sort(unique(study)), collapse = "+"),
+                   within_study = dplyr::n_distinct(study) < dplyr::n(),
+                   same_class   = dplyr::n_distinct(group3) == 1L,
+                   .groups = "drop")
+
+repeat_issue_extent <- list(
+  n_conversations              = nrow(issue_df),
+  n_conv_repeated_issue        = sum(issue_df$repeated_issue),
+  n_conv_repeat_exposure       = sum(issue_df$repeat_exposure),
+  n_persuadees                 = dplyr::n_distinct(issue_df$persuadee),
+  n_persuadees_repeated_issue  = dplyr::n_distinct(issue_df$persuadee[issue_df$repeated_issue]),
+  n_pairs                      = nrow(repeat_pairs),
+  n_pairs_across_studies       = sum(!repeat_pairs$within_study),
+  n_pairs_within_study         = sum(repeat_pairs$within_study),
+  n_pairs_same_class           = sum(repeat_pairs$same_class),
+  max_sessions_same_issue      = max(issue_df$n_on_issue),
+  pairs_by_studies             = dplyr::count(repeat_pairs, studies, name = "n_pairs")
+)
+save_rds(repeat_issue_extent, "repeat_issue_extent")
+
+message(sprintf(paste0(
+  "  same-issue repeats across S1-S3: %d of %d conversations, %d of %d ",
+  "persuadees, %d (persuadee, issue) pairs (%d across studies, %d within)"),
+  repeat_issue_extent$n_conv_repeated_issue, repeat_issue_extent$n_conversations,
+  repeat_issue_extent$n_persuadees_repeated_issue, repeat_issue_extent$n_persuadees,
+  repeat_issue_extent$n_pairs, repeat_issue_extent$n_pairs_across_studies,
+  repeat_issue_extent$n_pairs_within_study))
+print(repeat_issue_extent$pairs_by_studies)
 
 # =============================================================================
 # 5. First-session-only robustness (pooled S1-S3)
@@ -243,6 +334,85 @@ save_rds(repeat_first_session_ai_minus, "repeat_first_session_ai_minus")
 
 message("  first-session per-class TEs vs control:")
 print(repeat_first_session)
+
+# =============================================================================
+# 5b. AI minus human persuaders under cross-study definitions (pooled S1-S3)
+# =============================================================================
+# AI (unconstrained) minus all human persuaders pooled, from the
+# preregistered model with `group3` as the condition factor, refit
+#   * on all conversations (reference),
+#   * on each persuadee's first conversation on each issue,
+#   * excluding every conversation on a repeated issue,
+#   * with `attempt` counted across studies,
+#   * on each persuadee's first session across all studies (one row per
+#     persuadee, so no persuadee intercept and no attempt term),
+# plus the gap in first vs repeat conversations on an issue from a
+# group3 x exposure interaction model.
+ai_minus_human <- function(m, spec, n) {
+  em <- emmeans::emmeans(m, ~ group3, lmer.df = "asymptotic")
+  lv <- as.character(em@levels$group3)
+  w  <- stats::setNames(numeric(length(lv)), lv)
+  w["ai"] <- 1; w["human"] <- -1
+  emmeans::contrast(em, list(w)) |>
+    summary(infer = TRUE) |>
+    tibble::as_tibble() |>
+    dplyr::transmute(spec = spec, estimate, lower_ci = asymp.LCL,
+                     upper_ci = asymp.UCL, p_value = p.value, n = n)
+}
+
+first_session_global_df <- issue_df |>
+  dplyr::filter(attempt_global == 1L) |>
+  dplyr::mutate(group3 = forcats::fct_relevel(factor(group3), "control"))
+m_first_global <- lme4::lmer(post ~ pre + issue + group3 + (1 | persuader),
+                             data = first_session_global_df, REML = TRUE,
+                             control = lmm_control)
+
+exposure_df <- issue_df |>
+  dplyr::mutate(group3 = forcats::fct_relevel(factor(group3), "control"),
+                exposure_type = factor(ifelse(repeat_exposure, "repeat", "first")))
+m_exposure <- lme4::lmer(
+  post ~ pre + issue + attempt + group3 * exposure_type + (1 | persuader) + (1 | persuadee),
+  data = exposure_df, REML = TRUE, control = lmm_control
+)
+em_exposure <- emmeans::emmeans(m_exposure, ~ group3 | exposure_type, lmer.df = "asymptotic")
+w_exposure <- stats::setNames(numeric(nlevels(exposure_df$group3)), levels(exposure_df$group3))
+w_exposure["ai"] <- 1; w_exposure["human"] <- -1
+gap_by_exposure <- emmeans::contrast(em_exposure, list(ai_minus_human = w_exposure),
+                                     by = "exposure_type")
+tidy_gap <- function(x) {
+  summary(x, infer = TRUE) |>
+    tibble::as_tibble() |>
+    dplyr::mutate(lower_ci = asymp.LCL, upper_ci = asymp.UCL,
+                  p_value = p.value, n = NA_integer_)
+}
+gap_rows <- dplyr::bind_rows(
+  tidy_gap(gap_by_exposure) |>
+    dplyr::mutate(spec = paste0("exposure_", exposure_type),
+                  n    = as.integer(table(exposure_df$exposure_type)[as.character(exposure_type)])),
+  tidy_gap(emmeans::contrast(gap_by_exposure, method = "revpairwise", by = NULL)) |>
+    dplyr::mutate(spec = "exposure_repeat_minus_first")
+) |>
+  dplyr::select(spec, estimate, lower_ci, upper_ci, p_value, n)
+
+repeat_ai_minus_human <- dplyr::bind_rows(
+  ai_minus_human(fit_pooled_lmm(issue_df, "group3", label = "all"),
+                 "all", nrow(issue_df)),
+  ai_minus_human(fit_pooled_lmm(dplyr::filter(issue_df, !repeat_exposure), "group3",
+                                label = "first conversation on each issue"),
+                 "first_on_issue", sum(!issue_df$repeat_exposure)),
+  ai_minus_human(fit_pooled_lmm(dplyr::filter(issue_df, !repeated_issue), "group3",
+                                label = "no repeated issues"),
+                 "no_repeated_issues", sum(!issue_df$repeated_issue)),
+  ai_minus_human(fit_pooled_lmm(dplyr::mutate(issue_df, attempt = attempt_global), "group3",
+                                label = "attempt across studies"),
+                 "attempt_global", nrow(issue_df)),
+  ai_minus_human(m_first_global, "first_session_global", nrow(first_session_global_df)),
+  gap_rows
+)
+save_rds(repeat_ai_minus_human, "repeat_ai_minus_human")
+
+message("  AI minus human persuaders (pooled S1-S3):")
+print(repeat_ai_minus_human)
 
 # =============================================================================
 # 6. Carryover / learning / fatigue (attempt x treatment interaction)
@@ -314,16 +484,19 @@ repeat_summary <- list(
   n_multi_session     = sum(s1s3$n_sessions > 1L),
   pct_multi_session   = 100 * mean(s1s3$n_sessions > 1L),
   max_sessions_s1s3   = max(s1s3$n_sessions),
-  n_duplicate_issue_s1s3 = repeat_issue_check |>
-    dplyr::filter(study %in% c("study_1", "study_2", "study_3")) |>
+  n_duplicate_issue_s1s3 = repeat_issue_extent$n_pairs,
+  n_duplicate_issue_within_study_s1s3 = repeat_issue_check |>
+    dplyr::filter(study %in% POOLED_STUDIES) |>
     dplyr::pull(n_duplicate_issue_pairs) |>
     sum()
 )
 save_rds(repeat_summary, "repeat_summary")
 
-message(sprintf(
-  "  S1-S3: %d unique persuadees, %d (%.1f%%) multi-session, %d duplicate-issue sessions",
+message(sprintf(paste0(
+  "  S1-S3: %d unique persuadees, %d (%.1f%%) multi-session, %d repeated ",
+  "(persuadee, issue) pairs (%d within a study)"),
   repeat_summary$n_persuadees_s1s3, repeat_summary$n_multi_session,
-  repeat_summary$pct_multi_session, repeat_summary$n_duplicate_issue_s1s3))
+  repeat_summary$pct_multi_session, repeat_summary$n_duplicate_issue_s1s3,
+  repeat_summary$n_duplicate_issue_within_study_s1s3))
 
 message("\n  done.")

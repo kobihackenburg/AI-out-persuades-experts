@@ -30,12 +30,13 @@ DATA            <- file.path(PROJ_ROOT, "data")
 OUTPUT          <- file.path(PROJ_ROOT, "output")
 RESULTS         <- file.path(OUTPUT, "results")
 RESULTS_DATA    <- file.path(RESULTS, "_data")
+RESULTS_PY      <- file.path(RESULTS, "_py")   # CSVs written by code/analysis/py/*.py
 FIGURES_MAIN    <- file.path(OUTPUT, "figures", "main")
 FIGURES_SI      <- file.path(OUTPUT, "figures", "si")
 TABLES_MAIN     <- file.path(OUTPUT, "tables", "main")
 TABLES_SI       <- file.path(OUTPUT, "tables", "si")
 
-for (p in c(RESULTS, RESULTS_DATA, FIGURES_MAIN, FIGURES_SI, TABLES_MAIN, TABLES_SI)) {
+for (p in c(RESULTS, RESULTS_DATA, RESULTS_PY, FIGURES_MAIN, FIGURES_SI, TABLES_MAIN, TABLES_SI)) {
   if (!dir.exists(p)) dir.create(p, recursive = TRUE, showWarnings = FALSE)
 }
 
@@ -67,7 +68,7 @@ PERSUADER_CLASS_LABELS <- c(
   control                  = "Control",
   tournament               = "Tournament",
   random_lay_person        = "Random Laypeople",
-  elite_lay_person         = "Elite Laypeople",
+  elite_lay_person         = "Selected Laypeople",
   canvasser                = "Professional Canvassers",
   elite_debater            = "Elite Debaters",
   coached_elite_debater    = "Coached Elite Debaters",
@@ -131,4 +132,38 @@ complete_case_filter <- function(df, require_attitudes = TRUE,
     "  [%s] N assigned = %d -> matched = %d (-%d dropouts) -> CC = %d (-%d attrited, -%d pre NA, -%d post NA)",
     label, n_raw, n_match, n_drop, nrow(cc), n_attr, n_pre_na, n_post_na))
   cc
+}
+
+# ---- Elite-debater years of debating (free-text self-report) -------------
+# Shared by 99_extract_numbers.R, tab_persuader_demographics.R and
+# code/redact_data.R, which ships the parsed value (idempotent on it).
+# Years parsing rule: prefer bare-numeric self-reports; for entries that
+# combine "X years university, Y in school" or include school years
+# explicitly, use the total years of debating including school. This is
+# the rule that produces the manuscript's headline mean of 8.9 (a
+# first-number-only rule yields 8.8). Both rules are documented here so
+# any future change can be made deliberately.
+parse_debating_years <- function(s) {
+  if (is.na(s)) return(NA_real_)
+  s <- trimws(as.character(s))
+  if (s == "") return(NA_real_)
+  # Try strict numeric parse first (handles "10", "10.", "5.5").
+  num <- suppressWarnings(as.numeric(sub("[^0-9.].*$", "", s)))
+  if (!is.na(num) && grepl("^[0-9.]+\\s*$", s)) return(num)
+  if (!is.na(num) && grepl("^[0-9.]+\\s*\\.\\s*$", s)) return(num)
+  # Free-text cases. Pull out all integer-ish tokens.
+  nums <- as.numeric(stats::na.omit(unlist(regmatches(
+    s, gregexpr("[0-9]+(?:\\.[0-9]+)?", s)))))
+  nums <- nums[!is.na(nums) & nums > 0 & nums < 50]
+  if (length(nums) == 0L) return(NA_real_)
+  low <- tolower(s)
+  has_uni    <- grepl("universit|college|undergrad", low)
+  has_school <- grepl("\\bschool\\b|high school|high.?school", low)
+  # "4 university, 6 in school" -> sum the first two numbers (explicit split).
+  # Requires both keywords AND at least 2 numbers.
+  if (has_uni && has_school && length(nums) >= 2L) return(sum(nums[1:2]))
+  # Otherwise (incl. "15 (including school and university)" /
+  # "9 years including 2 years of high school" / "12 years.") -> take
+  # the first number, which the respondent reported as the total.
+  nums[1]
 }

@@ -28,12 +28,16 @@ tbl_df <- tibble::as_tibble(fe, rownames = "term") |>
   )
 
 n_per <- lme4::ngrps(m)[["persuader"]]
+vc <- as.data.frame(lme4::VarCorr(m))
+re_sd <- setNames(vc$sdcor, vc$grp)
+re_sentence <- sprintf("Random-intercept standard deviation for persuader: %.2f; residual standard deviation: %.2f.",
+                       re_sd[["persuader"]], re_sd[["Residual"]])
 
 tbl <- gt::gt(tbl_df) |>
   style_table(
     title    = gt::md("**Study 4 donation LMM -- full fixed-effects coefficient table.**"),
-    subtitle = sprintf("donation ~ pre_support + pre_willingness + age + ideology + group + (1|persuader). N = %d; n_persuader = %d. Reference: group = control.",
-                       nobs(m), n_per)
+    subtitle = sprintf("donation ~ pre_support + pre_willingness + age + ideology + group + (1|persuader). N = %d; n_persuader = %d. Reference: group = control. %s",
+                       nobs(m), n_per, re_sentence)
   )
 
 save_table(tbl, "tab_study4_lmm_coefs", TABLES_SI,
@@ -45,6 +49,8 @@ local({
   path <- file.path(TABLES_SI, "tab_study4_lmm_coefs.tex")
   txt  <- readLines(path)
   txt  <- sub("\\\\begin\\{table\\}\\[!t\\]", "\\\\begin{table}[H]", txt)
+  if (!any(grepl(re_sentence, txt, fixed = TRUE))) stop("random-effect sentence not found in caption")
+  txt  <- sub(re_sentence, paste0("\\added{", re_sentence, "}"), txt, fixed = TRUE)
   writeLines(txt, path)
 })
 message("  done.")

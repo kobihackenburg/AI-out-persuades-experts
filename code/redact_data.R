@@ -17,7 +17,16 @@
 #   code/analysis/elite_debater/annotations.json
 #                                       ->  <TARGET>/code/analysis/elite_debater/
 #                                            {annotations.json, audit.csv}
+#   data/final_followup_data/followup_{blocks,items}.csv
+#                                       ->  <TARGET>/data/final_followup_data/
+#   output/results/_py/*.csv + output/tables/si/tab_example_conversations.tex
+#                                       ->  <TARGET>/data/derived/
+#   output/example_conversations/       ->  <TARGET>/data/example_conversations/
 #   (private) .redact_id_map.csv        <-  reverse map raw_id -> anon_id
+#
+# The last two are written by `make results`, so run it in the private repo
+# first. The Reddit scores are exported by code/reddit/reddit_pangram.py
+# (--export-public), called from scripts/build_public.sh.
 #
 # De-identification:
 #   * Every Prolific participant id and session id is replaced by a stable
@@ -103,27 +112,10 @@ anon_one <- function(v) {
 anon_vec <- function(x) vapply(as.character(x), anon_one, character(1L), USE.NAMES = FALSE)
 
 # ----------------------------------------------------------------------------
-# Field parsers copied verbatim from 99_extract_numbers.R so the redacted data
-# reproduces the same derived numbers. Keep in sync if those parsers change.
+# Field parsers. Debating years use parse_debating_years() from _setup.R; the
+# nationality parser is copied from 99_extract_numbers.R so the redacted data
+# reproduce the same derived numbers. Keep in sync if that parser changes.
 # ----------------------------------------------------------------------------
-parse_debating_years <- function(s) {
-  if (is.na(s)) return(NA_real_)
-  s <- trimws(as.character(s))
-  if (s == "") return(NA_real_)
-  num <- suppressWarnings(as.numeric(sub("[^0-9.].*$", "", s)))
-  if (!is.na(num) && grepl("^[0-9.]+\\s*$", s)) return(num)
-  if (!is.na(num) && grepl("^[0-9.]+\\s*\\.\\s*$", s)) return(num)
-  nums <- as.numeric(stats::na.omit(unlist(regmatches(
-    s, gregexpr("[0-9]+(?:\\.[0-9]+)?", s)))))
-  nums <- nums[!is.na(nums) & nums > 0 & nums < 50]
-  if (length(nums) == 0L) return(NA_real_)
-  low <- tolower(s)
-  has_uni    <- grepl("universit|college|undergrad", low)
-  has_school <- grepl("\\bschool\\b|high school|high.?school", low)
-  if (has_uni && has_school && length(nums) >= 2L) return(sum(nums[1:2]))
-  nums[1]
-}
-
 norm_country <- function(s) {
   if (is.na(s) || s == "") return(character(0))
   s <- gsub("&#x2F;", "/", s, fixed = TRUE)
@@ -263,6 +255,129 @@ redact_fact_checks <- function() {
 }
 
 # ----------------------------------------------------------------------------
+# Redact the follow-up survey (si_13 reads blocks + items only). Block ids embed
+# the Prolific id, so blocks are renumbered; each single-exposure block carries
+# the pseudonymised row_id of its conversation instead of studies + session_ids.
+# The participant, Study 4 bonus and API-error files are not shipped.
+# ----------------------------------------------------------------------------
+redact_followup <- function() {
+  root <- file.path(DATA, "final_followup_data")
+  if (!dir.exists(root)) {
+    message("  [skip] data/final_followup_data/ (not found)")
+    return(invisible())
+  }
+  blocks <- readr::read_csv(file.path(root, "followup_blocks.csv"),
+                            col_types = readr::cols(.default = readr::col_character()), progress = FALSE)
+  items  <- readr::read_csv(file.path(root, "followup_items.csv"),
+                            col_types = readr::cols(.default = readr::col_character()), progress = FALSE)
+  block_key <- setNames(sprintf("block_%05d", seq_len(nrow(blocks))), blocks$block_id)
+  single <- blocks$exposure_pattern == "single" & !grepl("[;,|]", blocks$session_ids)
+  row_key <- ifelse(single, paste0(blocks$studies, ":", blocks$session_ids), NA_character_)
+
+  out_blocks <- tibble::tibble(
+    block_id         = unname(block_key[blocks$block_id]),
+    row_id           = anon_vec(row_key),
+    exposure_pattern = blocks$exposure_pattern,
+    skipped          = blocks$skipped,
+    served_at        = blocks$served_at,
+    completed_at     = blocks$completed_at,
+    last_exposure_at = blocks$last_exposure_at
+  )
+  out_items <- tibble::tibble(
+    block_id  = unname(block_key[items$block_id]),
+    item_id   = items$item_id,
+    value_raw = items$value_raw
+  )
+  if (anyNA(out_items$block_id)) stop("follow-up items reference unknown blocks")
+
+  dest <- file.path(TARGET_DATA, "final_followup_data")
+  dir.create(dest, recursive = TRUE, showWarnings = FALSE)
+  readr::write_csv(out_blocks, file.path(dest, "followup_blocks.csv"), na = "")
+  readr::write_csv(out_items,  file.path(dest, "followup_items.csv"),  na = "")
+  message(sprintf("  wrote   %s  (%d blocks, %d items)", dest, nrow(out_blocks), nrow(out_items)))
+}
+
+# ----------------------------------------------------------------------------
+# Derived inputs that code/analysis/py/*.py computes from message text, which
+# the public data do not carry. The CSVs are shipped with their keys
+# pseudonymised; the Makefile copies data/derived/ into place instead of
+# running the Python step when that folder exists.
+# ----------------------------------------------------------------------------
+DERIVED_KEYS <- c("row_id", "persuadee_session")
+DERIVED_TABLES <- c("tab_example_conversations.tex")
+
+redact_derived <- function() {
+  src <- file.path(RESULTS, "_py")
+  files <- list.files(src, pattern = "\\.csv$", full.names = TRUE)
+  if (length(files) == 0L) stop("no CSVs in ", src, "; run make results in the private repo first")
+  dest <- file.path(TARGET_DATA, "derived")
+  unlink(dest, recursive = TRUE)
+  dir.create(dest, recursive = TRUE)
+  for (f in files) {
+    df <- readr::read_csv(f, col_types = readr::cols(.default = readr::col_character()), progress = FALSE)
+    for (k in intersect(DERIVED_KEYS, names(df))) df[[k]] <- anon_vec(df[[k]])
+    readr::write_csv(df, file.path(dest, basename(f)), na = "")
+  }
+  for (t in DERIVED_TABLES) {
+    tf <- file.path(TABLES_SI, t)
+    if (!file.exists(tf)) stop(tf, " not found; run make results in the private repo first")
+    file.copy(tf, file.path(dest, t), overwrite = TRUE)
+  }
+  message(sprintf("  wrote   %s  (%d CSVs, %d tables)", dest, length(files), length(DERIVED_TABLES)))
+}
+
+# ----------------------------------------------------------------------------
+# Example conversations (SI "Example conversations"): the screened transcripts
+# are released as written, with each conversation's row_id replaced by its
+# pseudonym in the manifest, the transcript header and the file name.
+# ----------------------------------------------------------------------------
+redact_examples <- function() {
+  src <- here::here("output", "example_conversations")
+  manifest_path <- file.path(src, "manifest.csv")
+  if (!file.exists(manifest_path)) stop(manifest_path, " not found; run make results in the private repo first")
+  manifest <- readr::read_csv(manifest_path, col_types = readr::cols(.default = readr::col_character()),
+                              progress = FALSE)
+  dest <- file.path(TARGET_DATA, "example_conversations")
+  unlink(dest, recursive = TRUE)
+  dir.create(file.path(dest, "transcripts"), recursive = TRUE)
+  anon <- anon_vec(manifest$row_id)
+  new_file <- paste0(sub("_[0-9a-f]{6}\\.txt$", "", manifest$file), "_", anon, ".txt")
+  for (i in seq_len(nrow(manifest))) {
+    txt <- readLines(file.path(src, "transcripts", manifest$file[i]), encoding = "UTF-8", warn = FALSE)
+    if (!any(grepl(manifest$row_id[i], txt, fixed = TRUE))) stop("row_id not in transcript ", manifest$file[i])
+    txt <- gsub(manifest$row_id[i], anon[i], txt, fixed = TRUE)
+    writeLines(txt, file.path(dest, "transcripts", new_file[i]), useBytes = TRUE)
+  }
+  manifest$file <- new_file
+  manifest$row_id <- anon
+  readr::write_csv(manifest, file.path(dest, "manifest.csv"), na = "")
+  message(sprintf("  wrote   %s  (%d transcripts)", dest, nrow(manifest)))
+}
+
+# ----------------------------------------------------------------------------
+# The shipped code must not carry raw ids either (e.g. the example-conversation
+# screening list in code/analysis/py/si_12_example_conversations.py): row_ids
+# written into code are replaced by their pseudonyms, and any other 24-hex id
+# left in <TARGET>/code stops the build.
+# ----------------------------------------------------------------------------
+redact_code_ids <- function() {
+  files <- list.files(file.path(TARGET_ROOT, "code"), recursive = TRUE, full.names = TRUE,
+                      pattern = "\\.(R|py|md|json|csv|txt|sh)$")
+  n_replaced <- 0L
+  for (f in files) {
+    txt <- readLines(f, encoding = "UTF-8", warn = FALSE)
+    ids <- unique(unlist(regmatches(txt, gregexpr("study_[0-9]:[0-9a-f]{24}", txt))))
+    if (length(ids)) {
+      for (id in ids) txt <- gsub(id, anon_one(id), txt, fixed = TRUE)
+      writeLines(txt, f, useBytes = TRUE)
+      n_replaced <- n_replaced + length(ids)
+    }
+    if (any(grepl("\\b[0-9a-f]{24}\\b", txt))) stop("raw 24-hex id left in shipped code: ", f)
+  }
+  message(sprintf("  pseudonymised %d row_id(s) in shipped code", n_replaced))
+}
+
+# ----------------------------------------------------------------------------
 # Redact the elite-debater annotation bundle. 99_extract_numbers.R reads only
 # audit.csv (row count + the 7 boolean criteria), never the evidence strings
 # or ids. We anonymise ids, blank evidence, drop input.json (raw achievements).
@@ -326,6 +441,18 @@ redact_fact_checks()
 
 message("\n-- elite debater bundle --")
 redact_elite_debater()
+
+message("\n-- follow-up survey --")
+redact_followup()
+
+message("\n-- derived inputs (code/analysis/py) --")
+redact_derived()
+
+message("\n-- example conversations --")
+redact_examples()
+
+message("\n-- ids in shipped code --")
+redact_code_ids()
 
 # Dump the private reverse map (first-seen order).
 map_df <- tibble::tibble(

@@ -1,0 +1,30 @@
+stratum,draw_rank,row_id,status
+study_2:ai:assisted_suicide,1,anon_0064009,selected
+study_2:ai_constrained:assisted_suicide,1,anon_0060934,selected
+study_2:coached_elite_debater:assisted_suicide,1,anon_0062282,selected
+study_2:ai:historic_objects,1,anon_0060727,selected
+study_2:ai_constrained:historic_objects,1,anon_0061607,selected
+study_2:coached_elite_debater:historic_objects,1,anon_0062138,selected
+study_2:ai:pension_age,1,anon_0062023,selected
+study_2:ai_constrained:pension_age,1,anon_0062086,selected
+study_2:coached_elite_debater:pension_age,1,anon_0064527,selected
+study_2:ai:protester_penalties,1,anon_0064943,selected
+study_2:ai_constrained:protester_penalties,1,anon_0065554,selected
+study_2:coached_elite_debater:protester_penalties,1,anon_0063292,selected
+study_2:ai:social_media_ban,1,anon_0062441,rejected: persuadee PII (names a friend; occupation and age)
+study_2:ai:social_media_ban,2,anon_0063129,selected
+study_2:ai_constrained:social_media_ban,1,anon_0062750,selected
+study_2:coached_elite_debater:social_media_ban,1,anon_0063417,selected
+study_2:ai:ukraine_peace_deal,1,anon_0062993,selected
+study_2:ai_constrained:ukraine_peace_deal,1,anon_0064048,selected
+study_2:coached_elite_debater:ukraine_peace_deal,1,anon_0064180,selected
+study_4:ai,1,anon_0081009,selected
+study_4:ai,2,anon_0081018,selected
+study_4:ai,3,anon_0080194,selected
+study_4:canvasser,1,anon_0083296,rejected: politically sensitive (current conflicts)
+study_4:canvasser,2,anon_0082590,rejected: persuader PII (family details)
+study_4:canvasser,3,anon_0080610,selected
+study_4:canvasser,4,anon_0081107,selected
+study_4:canvasser,5,anon_0080852,rejected: unverified allegations against a named organization
+study_4:canvasser,6,anon_0082808,"rejected: politically sensitive (party politics, named politicians); persuadee PII"
+study_4:canvasser,7,anon_0082341,selected

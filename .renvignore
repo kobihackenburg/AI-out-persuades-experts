@@ -4,4 +4,4 @@
 # which makes Rscript hang for minutes.
 data/
 output/
-study_context/
+paper/

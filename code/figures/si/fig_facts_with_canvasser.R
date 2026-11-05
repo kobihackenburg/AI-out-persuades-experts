@@ -107,7 +107,7 @@ panel <- ggplot2::ggplot(panel_df,
     colour  = AI_RED
   ), r2_label_args)) +
   ggplot2::labs(
-    x = "Facts per conversation (log scale)",
+    x = "Claims per conversation (log scale)",
     y = "Estimated persuasive impact (pp)"
   ) +
   theme_persuasion4() +

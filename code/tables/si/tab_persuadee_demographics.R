@@ -13,10 +13,14 @@ message("\n==== code/tables/si/tab_persuadee_demographics.R ====")
 
 studies <- load_studies(c("study_1", "study_2", "study_3", "study_4"))
 
-bach_or_higher <- function(x) {
-  tolower(as.character(x)) %in%
-    c("bsc/ba", "master's degree", "phd", "bsc / ba", "bachelor",
-      "bachelor's degree")
+BACH_OR_HIGHER <- c("bsc/ba", "master's degree", "phd", "bsc / ba", "bachelor",
+                    "bachelor's degree")
+
+# Percentage of persuadees who reported the item, among those who reported it.
+pct_in <- function(x, values) {
+  x <- tolower(as.character(x))
+  x <- x[!is.na(x)]
+  100 * mean(x %in% values)
 }
 
 # Income bracket ordering (ascending). The raw income column in the data ships
@@ -71,17 +75,16 @@ per_study <- purrr::imap_dfr(studies, function(df, study_id) {
     n               = nrow(cc),
     age_mean        = mean(cc$age, na.rm = TRUE),
     age_sd          = stats::sd(cc$age, na.rm = TRUE),
-    pct_women       = 100 * mean(tolower(cc$gender) %in% c("female", "woman", "f"), na.rm = TRUE),
-    pct_white       = 100 * mean(cc$ethnicity == "White", na.rm = TRUE),
+    pct_women       = pct_in(cc$gender, c("female", "woman", "f")),
+    pct_white       = pct_in(cc$ethnicity, "white"),
     median_income   = median_income_bracket(cc$income),
-    pct_bach_plus   = 100 * mean(bach_or_higher(cc$education), na.rm = TRUE),
-    pct_left        = 100 * mean(tolower(cc$ideology_text) %in% c("left", "centre-left"), na.rm = TRUE),
-    pct_centre      = 100 * mean(tolower(cc$ideology_text) %in% c("centre/moderate", "centre", "moderate"), na.rm = TRUE),
-    pct_right       = 100 * mean(tolower(cc$ideology_text) %in% c("centre-right", "right"), na.rm = TRUE),
-    pct_lab         = 100 * mean(tolower(cc$party) %in% c("labour"), na.rm = TRUE),
-    pct_con         = 100 * mean(tolower(cc$party) %in% c("conservative"), na.rm = TRUE),
-    pct_other_party = 100 * mean(!tolower(cc$party) %in% c("labour", "conservative") &
-                                   !is.na(cc$party), na.rm = TRUE)
+    pct_bach_plus   = pct_in(cc$education, BACH_OR_HIGHER),
+    pct_left        = pct_in(cc$ideology_text, c("left", "centre-left")),
+    pct_centre      = pct_in(cc$ideology_text, c("centre/moderate", "centre", "moderate")),
+    pct_right       = pct_in(cc$ideology_text, c("centre-right", "right")),
+    pct_lab         = pct_in(cc$party, "labour"),
+    pct_con         = pct_in(cc$party, "conservative"),
+    pct_other_party = 100 - pct_in(cc$party, c("labour", "conservative"))
   )
 })
 

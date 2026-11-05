@@ -52,7 +52,7 @@ tbl_df <- pr |>
 tbl <- gt::gt(tbl_df, groupname_col = "Item") |>
   style_table(
     title    = gt::md("**AI minus each human class on the 7-item partner-rating battery (pooled S1-S3).**"),
-    subtitle = "Per-item LMM: rating ~ issue + study + group + (1|persuader) + (1|persuadee), pooled across Studies 1-3. Each block is one battery item; rows give the AI minus comparator-class contrast in 0-100 rating-scale points. Positive estimates indicate the AI was rated higher than the comparator on the item as worded; for the bottom three items (anthropomorphism, deception, bias), a higher rating is unfavourable for the rated partner. p-values are uncorrected."
+    subtitle = "Per-item LMM: rating ~ issue + study + group + (1|persuader) + (1|persuadee), pooled across Studies 1-3. Each block is one battery item; rows give the AI minus comparator-class contrast in 0-100 rating-scale points. Positive estimates indicate the AI was rated higher than the comparator on the item as worded; for the bottom three items (anthropomorphism, deception, bias), a higher rating is unfavorable for the rated partner. p-values are uncorrected."
   ) |>
   gt::tab_options(row_group.font.weight = "bold")
 

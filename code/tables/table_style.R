@@ -56,14 +56,24 @@ style_table <- function(gt_tbl, title = NULL, subtitle = NULL) {
 #   "shrink"    - wrap \begin{tabular*}...\end{tabular*} in
 #                 \resizebox{\linewidth}{!}{...}: tables wider than the text
 #                 block are auto-scaled down (font shrinks).
+#   "fit"       - set the tabular at its natural width and scale it down to
+#                 \linewidth only if it is wider ("shrink" fixes the tabular*
+#                 at \linewidth, so its content overflows instead of scaling).
 #   "landscape" - wrap the whole \begin{table}...\end{table} in
 #                 \begin{landscape}...\end{landscape} (requires pdflscape,
 #                 already loaded in SI.tex).
+#   "landscape_fit" - "landscape" with the tabular scaled as in "fit".
 #   "longtable" - convert the float to a longtable env so a tall table can
 #                 break across pages. Use sparingly; longtable doesn't float
 #                 and ignores \begin{table}[t] placement.
+#
+# new = TRUE marks a table added in the R1 revision: its caption is wrapped in
+# \added{} so it prints in blue in the tracked-changes build (see
+# paper/review/tools/strip_added.py).
 save_table <- function(gt_tbl, name, dir, label = NULL,
-                       layout = c("auto", "shrink", "landscape", "longtable")) {
+                       layout = c("auto", "shrink", "fit", "landscape", "landscape_fit",
+                                  "longtable"),
+                       new = FALSE) {
   layout <- match.arg(layout)
 
   if (!dir.exists(dir)) dir.create(dir, recursive = TRUE, showWarnings = FALSE)
@@ -78,11 +88,14 @@ save_table <- function(gt_tbl, name, dir, label = NULL,
   txt <- .bold_headers(txt)
   txt <- .stripe_rows(txt, layout)
   if (!is.null(label)) txt <- .inject_label(txt, label, path)
+  if (new) txt <- .mark_new_caption(txt)
 
   txt <- switch(layout,
     auto      = txt,
     shrink    = .wrap_shrink(txt),
+    fit       = .wrap_fit(txt),
     landscape = .wrap_landscape(txt),
+    landscape_fit = .wrap_landscape(.wrap_fit(txt)),
     longtable = .wrap_longtable(txt, label)
   )
   txt <- .left_align_captions(txt)
@@ -99,6 +112,17 @@ save_table <- function(gt_tbl, name, dir, label = NULL,
 }
 
 # -- caption + label helpers -----------------------------------------------
+
+# Wrap the caption body (between the "\caption{" line and its closing "}"
+# line, as written by .clean_gt_caption) in \added{}.
+.mark_new_caption <- function(txt) {
+  open_idx <- grep("^\\\\caption\\{\\s*$", txt)
+  if (length(open_idx) == 0L) stop("save_table(new = TRUE): no caption found")
+  close_idx <- open_idx[1] + grep("^\\}", txt[(open_idx[1] + 1L):length(txt)])[1]
+  txt[open_idx[1]] <- "\\caption{\\added{"
+  txt[close_idx] <- sub("^\\}", "}}", txt[close_idx])
+  txt
+}
 
 .inject_centering <- function(txt) {
   idx <- grep("^\\\\begin\\{table\\}", txt)
@@ -346,6 +370,21 @@ save_table <- function(gt_tbl, name, dir, label = NULL,
   c(
     txt[seq_len(bi - 1L)],
     "\\resizebox{\\linewidth}{!}{%",
+    txt[bi:ei],
+    "}",
+    txt[seq.int(ei + 1L, length(txt))]
+  )
+}
+
+.wrap_fit <- function(txt) {
+  txt <- .convert_tabular_star(txt)
+  begin_idx <- grep("^\\\\begin\\{tabular\\}", txt)
+  end_idx   <- grep("^\\\\end\\{tabular\\}",   txt)
+  if (length(begin_idx) == 0L || length(end_idx) == 0L) return(txt)
+  bi <- begin_idx[1]; ei <- end_idx[1]
+  c(
+    txt[seq_len(bi - 1L)],
+    "\\resizebox{\\ifdim\\width>\\linewidth\\linewidth\\else\\width\\fi}{!}{%",
     txt[bi:ei],
     "}",
     txt[seq.int(ei + 1L, length(txt))]
